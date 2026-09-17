@@ -1,0 +1,8 @@
+{"code": 0, "message": "Success", "zpData": {"hasMore": false, "jobList": [
+  {"encryptJobId": "SYN0103cccc", "jobName": "AI 训练师", "salaryDesc": "300-400元/天", "cityName": "合肥",
+   "areaDistrict": "包河区", "businessDistrict": "", "jobExperience": "经验不限", "jobDegree": "大专",
+   "brandName": "合成科技三号", "bossTitle": "招聘专员", "bossOnline": true, "brandScaleName": "20-99人",
+   "brandStageName": "未融资", "brandIndustry": "数据服务", "jobLabels": ["经验不限", "大专"],
+   "skills": [], "welfareList": [], "securityId": "SYN-SECURITY-103", "lid": "SYN.lid.103",
+   "encryptBossId": "SYNBOSS103", "encryptBrandId": ""}
+]}}

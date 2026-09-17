@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "stream", "stream_revision", "type", "subject_kind", "occurred_at", "payload", "idempotency_key", "origin"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "stream": {"type": "string", "minLength": 1, "maxLength": 80},
+    "stream_revision": {"type": "integer", "minimum": 1},
+    "type": {"type": "string", "minLength": 1, "maxLength": 64},
+    "subject_kind": {"enum": ["job", "company", "application", "none"]},
+    "subject_id": {"type": ["string", "null"], "maxLength": 200},
+    "occurred_at": {"type": "string", "minLength": 20, "maxLength": 40},
+    "payload": {"type": "object"},
+    "idempotency_key": {"type": "string", "minLength": 8, "maxLength": 200},
+    "origin": {"enum": ["agent", "user"]},
+    "corrected": {
+      "type": "object", "additionalProperties": false, "required": ["corrected_event_id", "op"],
+      "properties": {
+        "corrected_event_id": {"type": "string", "minLength": 1},
+        "op": {"enum": ["replace", "retract"]},
+        "original_type": {"type": "string"},
+        "replacement_payload": {"type": "object"},
+        "replacement_occurred_at": {"type": "string"}
+      }
+    }
+  }
+}

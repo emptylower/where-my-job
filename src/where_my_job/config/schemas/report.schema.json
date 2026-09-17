@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "ref_claim": {
+      "type": "object", "additionalProperties": false,
+      "required": ["evidence_id", "claim"],
+      "properties": {
+        "evidence_id": {"type": "string", "minLength": 1, "maxLength": 200},
+        "claim": {"type": "string", "minLength": 1, "maxLength": 2000}
+      }
+    },
+    "sentence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["original", "explanation"],
+      "properties": {
+        "original": {"type": "string", "minLength": 1, "maxLength": 4000},
+        "explanation": {"type": "string", "minLength": 1, "maxLength": 4000},
+        "evidence_id": {"type": "string", "minLength": 1, "maxLength": 200},
+        "assumption": {"type": "string", "minLength": 1, "maxLength": 2000}
+      },
+      "anyOf": [{"required": ["evidence_id"]}, {"required": ["assumption"]}]
+    },
+    "mismatch": {
+      "type": "object", "additionalProperties": false,
+      "required": ["requirement", "profile", "severity"],
+      "properties": {
+        "requirement": {"type": "string", "minLength": 1, "maxLength": 2000},
+        "profile": {"type": "string", "minLength": 1, "maxLength": 2000},
+        "severity": {"enum": ["high", "medium", "low", "unknown"]},
+        "evidence_id": {"type": "string", "minLength": 1, "maxLength": 200},
+        "assumption": {"type": "string", "minLength": 1, "maxLength": 2000}
+      },
+      "anyOf": [{"required": ["evidence_id"]}, {"required": ["assumption"]}]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "job_id", "bundle_id", "profile_revision", "idempotency_key",
+               "authentic", "jd_translation", "mismatches", "resume_advice", "report_md"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "job_id": {"type": "string", "pattern": "^boss:[A-Za-z0-9~_-]{1,128}$"},
+    "bundle_id": {"type": "string", "minLength": 1, "maxLength": 200},
+    "extra_evidence_ids": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 200},
+                           "uniqueItems": true, "maxItems": 200},
+    "profile_revision": {"type": "string", "minLength": 1, "maxLength": 200},
+    "idempotency_key": {"type": "string", "minLength": 8, "maxLength": 200},
+    "authentic": {
+      "type": "object", "additionalProperties": false,
+      "required": ["facts", "supporting", "opposing", "unknowns", "conclusion", "conclusion_label"],
+      "properties": {
+        "facts": {"type": "array", "items": {"$ref": "#/$defs/ref_claim"}},
+        "supporting": {"type": "array", "items": {"$ref": "#/$defs/ref_claim"}},
+        "opposing": {"type": "array", "items": {"$ref": "#/$defs/ref_claim"}},
+        "unknowns": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 1000}},
+        "conclusion": {"enum": ["倾向真实在招", "倾向长期挂岗", "证据不足"]},
+        "conclusion_label": {"const": "推断"}
+      }
+    },
+    "jd_translation": {
+      "type": "object", "additionalProperties": false, "required": ["sentences"],
+      "properties": {"sentences": {"type": "array", "items": {"$ref": "#/$defs/sentence"}}}
+    },
+    "mismatches": {"type": "array", "items": {"$ref": "#/$defs/mismatch"}},
+    "resume_advice": {
+      "type": "object", "additionalProperties": false, "required": ["proven", "to_reach"],
+      "properties": {
+        "proven": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 2000}},
+        "to_reach": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 2000}}
+      }
+    },
+    "report_md": {"type": "string", "minLength": 1, "maxLength": 262144}
+  }
+}

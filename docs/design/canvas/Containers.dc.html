@@ -1,0 +1,162 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: "IBM Plex Sans", "PingFang SC", "Noto Sans SC", system-ui, sans-serif; color: #1E2229; }
+    a { color: #1F6F78; } a:hover { color: #164F56; }
+    svg text { font-family: inherit; }
+    .mono { font-family: "IBM Plex Mono", "PingFang SC", Menlo, monospace; }
+  </style>
+</helmet>
+<div style="width: 1200px; height: 900px; box-sizing: border-box; background: #FFFFFF; padding: 32px 40px; display: flex; flex-direction: column; gap: 12px;">
+  <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #D5D8DD; padding-bottom: 10px;">
+    <div style="font-size: 20px; font-weight: 600;">C2 · 容器与组件图（C4 Level 2/3）</div>
+    <div style="font-size: 12px; color: #6B7280">设计 v3 §3、§11：service 编排事务，policy 管受控网络动作，adapter 逐响应接收</div>
+  </div>
+  <svg width="1120" height="780" viewBox="0 0 1120 780">
+    <defs>
+      <marker id="ar" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#2F3640"/></marker>
+    </defs>
+    <rect x="20" y="20" width="200" height="70" rx="4" fill="#FBF1E1" stroke="#B8741A" stroke-width="1.5"/>
+    <text x="120" y="48" font-size="14" font-weight="600" text-anchor="middle">Coding Agent</text>
+    <text x="120" y="68" font-size="11" text-anchor="middle" fill="#3C4858">[External · 进程]</text>
+
+    <rect x="250" y="20" width="850" height="600" rx="6" fill="none" stroke="#1F6F78" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <text x="264" y="42" font-size="12" font-weight="600" fill="#1F6F78">where-my-job 仓库（uv tool install；根目录 SKILL.md）</text>
+
+    <rect x="270" y="60" width="240" height="170" rx="4" fill="#FFFFFF" stroke="#B8741A" stroke-width="1.5"/>
+    <text x="390" y="84" font-size="14" font-weight="600" text-anchor="middle">SKILL.md + skill/</text>
+    <text x="390" y="102" font-size="11" text-anchor="middle" fill="#3C4858">[Container · 文档，agent 读取]</text>
+    <text x="284" y="124" font-size="11" class="mono">references/ 访谈 · 隐私边界</text>
+    <text x="284" y="140" font-size="11" class="mono">  profile/strategy/scoring/panel</text>
+    <text x="284" y="156" font-size="11" class="mono">  evidence-report/event/stream schema</text>
+    <text x="284" y="172" font-size="11" class="mono">  report-template · research-checklist</text>
+    <text x="284" y="192" font-size="11" class="mono">examples/ 全部合成（虚构画像）</text>
+    <text x="284" y="214" font-size="11" fill="#6B7280">不含可执行逻辑，不含真实数据</text>
+
+    <rect x="540" y="60" width="540" height="540" rx="4" fill="#F4F9F9" stroke="#1F6F78" stroke-width="1.5"/>
+    <text x="810" y="84" font-size="14" font-weight="600" text-anchor="middle">where_my_job/ · Python 包 · console script `where-my-job`</text>
+    <text x="810" y="102" font-size="11" text-anchor="middle" fill="#3C4858">[Container · 每次子命令一个进程；无监听端口；不 import LLM SDK]</text>
+
+    <rect x="560" y="118" width="500" height="40" rx="3" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.2"/>
+    <text x="574" y="135" font-size="12" font-weight="600">cli</text>
+    <text x="574" y="150" font-size="11" fill="#3C4858">只解析参数与调度；JSON envelope；五档退出码；stderr 日志</text>
+
+    <rect x="560" y="170" width="500" height="40" rx="3" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.2"/>
+    <text x="574" y="187" font-size="12" font-weight="600">service</text>
+    <text x="574" y="202" font-size="11" fill="#3C4858">编排事务：scan/deepdive/match/report set/event add/stream register；向纯函数提供事实快照</text>
+
+    <rect x="560" y="224" width="160" height="88" rx="3" fill="#FFF3E0" stroke="#E65100" stroke-width="1.2"/>
+    <text x="574" y="242" font-size="12" font-weight="600">policy</text>
+    <text x="574" y="258" font-size="11" fill="#3C4858">统一网络门禁：文件锁</text>
+    <text x="574" y="272" font-size="11" fill="#3C4858">预占动作 · 滚动预算</text>
+    <text x="574" y="286" font-size="11" fill="#3C4858">冷却 · 逐响应风控判定</text>
+    <text x="574" y="302" font-size="10" fill="#6B7280">写 network_policy_state</text>
+
+    <rect x="730" y="224" width="160" height="88" rx="3" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.2"/>
+    <text x="744" y="242" font-size="12" font-weight="600">adapter</text>
+    <text x="744" y="258" font-size="11" fill="#3C4858">被动捕获目标响应</text>
+    <text x="744" y="272" font-size="11" fill="#3C4858">typed: success/empty/</text>
+    <text x="744" y="286" font-size="11" fill="#3C4858">blocked/unauth/unknown</text>
+    <text x="744" y="302" font-size="10" fill="#6B7280">映射前保存 api_entry</text>
+
+    <rect x="900" y="224" width="160" height="88" rx="3" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.2"/>
+    <text x="914" y="242" font-size="12" font-weight="600">launcher</text>
+    <text x="914" y="258" font-size="11" fill="#3C4858">自有受限 Chrome 启动</text>
+    <text x="914" y="272" font-size="11" fill="#3C4858">校验回环监听/进程归属</text>
+    <text x="914" y="286" font-size="11" fill="#3C4858">browser stop</text>
+    <text x="914" y="302" font-size="10" fill="#6B7280">不拷贝主 Chrome Cookie</text>
+
+    <rect x="560" y="326" width="160" height="88" rx="3" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.2"/>
+    <text x="574" y="344" font-size="12" font-weight="600">normalize</text>
+    <text x="574" y="360" font-size="11" fill="#3C4858">纯函数：条目 → 标准事实</text>
+    <text x="574" y="374" font-size="11" fill="#3C4858">薪资单位/币种/薪数</text>
+    <text x="574" y="388" font-size="11" fill="#3C4858">经验/学历枚举 · 技能集合</text>
+    <text x="574" y="404" font-size="10" fill="#6B7280">未知保持 NULL</text>
+
+    <rect x="730" y="326" width="160" height="88" rx="3" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.2"/>
+    <text x="744" y="344" font-size="12" font-weight="600">rules</text>
+    <text x="744" y="360" font-size="11" fill="#3C4858">纯函数：条件树 all/any/not/</text>
+    <text x="744" y="374" font-size="11" fill="#3C4858">exists + 5 叶子算子</text>
+    <text x="744" y="388" font-size="11" fill="#3C4858">first-match · 计分组封顶</text>
+    <text x="744" y="404" font-size="10" fill="#6B7280">unknown 传播；受限 worker 超时</text>
+
+    <rect x="900" y="326" width="160" height="88" rx="3" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.2"/>
+    <text x="914" y="344" font-size="12" font-weight="600">validate</text>
+    <text x="914" y="360" font-size="11" fill="#3C4858">纯函数：JSON Schema +</text>
+    <text x="914" y="374" font-size="11" fill="#3C4858">语义检查（预算上限、</text>
+    <text x="914" y="388" font-size="11" fill="#3C4858">升版兼容、引用存在）</text>
+    <text x="914" y="404" font-size="10" fill="#6B7280">事实快照由 service 提供</text>
+
+    <rect x="560" y="428" width="245" height="88" rx="3" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.2"/>
+    <text x="574" y="446" font-size="12" font-weight="600">store</text>
+    <text x="574" y="462" font-size="11" fill="#3C4858">唯一数据库访问层；15 张核心表迁移</text>
+    <text x="574" y="476" font-size="11" fill="#3C4858">固定视图 v_jobs / v_events / v_evidence / v_runs</text>
+    <text x="574" y="490" font-size="11" fill="#3C4858">预定义参数化查询；FK、busy timeout</text>
+    <text x="574" y="506" font-size="10" fill="#6B7280">raw 与私有画像不进任何视图</text>
+
+    <rect x="815" y="428" width="245" height="88" rx="3" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.2"/>
+    <text x="829" y="446" font-size="12" font-weight="600">panel</text>
+    <text x="829" y="462" font-size="11" fill="#3C4858">固定视图 + 类型化筛选 → 单文件 HTML</text>
+    <text x="829" y="476" font-size="11" fill="#3C4858">上下文转义；固定可信筛选脚本</text>
+    <text x="829" y="490" font-size="11" fill="#3C4858">无外部资源；链接协议白名单</text>
+    <text x="829" y="506" font-size="10" fill="#6B7280">可选注册流时间线 tab</text>
+
+    <rect x="560" y="530" width="245" height="56" rx="3" fill="#FFF8EE" stroke="#3C4858" stroke-width="1.2"/>
+    <text x="574" y="548" font-size="12" font-weight="600">vendor/boss_cdp_raw（最小必要源码）</text>
+    <text x="574" y="564" font-size="11" fill="#3C4858">只复用 CDP 会话与捕获原语；记录 commit/hash</text>
+    <text x="574" y="578" font-size="10" fill="#6B7280">不调用会吞错误/丢原文的高层循环；不修改</text>
+
+    <rect x="815" y="530" width="245" height="56" rx="3" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.2"/>
+    <text x="829" y="548" font-size="12" font-weight="600">importer · config</text>
+    <text x="829" y="564" font-size="11" fill="#3C4858">历史 JSON → import run（legacy_mapped）</text>
+    <text x="829" y="578" font-size="10" fill="#6B7280">路径解析、schema_version、默认值</text>
+
+    <rect x="20" y="640" width="200" height="120" rx="4" fill="#EEF0F3" stroke="#3C4858" stroke-width="1.5"/>
+    <text x="120" y="666" font-size="13" font-weight="600" text-anchor="middle">~/.where-my-job/</text>
+    <text x="120" y="684" font-size="11" text-anchor="middle" fill="#3C4858">where-my-job.sqlite</text>
+    <text x="120" y="699" font-size="11" text-anchor="middle" fill="#3C4858">profile · scoring · strategies/</text>
+    <text x="120" y="714" font-size="11" text-anchor="middle" fill="#3C4858">streams/ · panel · settings</text>
+    <text x="120" y="729" font-size="11" text-anchor="middle" fill="#3C4858">state/ 锁 · resume/ · panel/</text>
+    <text x="120" y="748" font-size="10" text-anchor="middle" fill="#6B7280">0700 / 0600 · 不进 git</text>
+
+    <rect x="460" y="660" width="220" height="90" rx="4" fill="#EEF0F3" stroke="#3C4858" stroke-width="1.5"/>
+    <text x="570" y="688" font-size="13" font-weight="600" text-anchor="middle">专用 Chrome</text>
+    <text x="570" y="706" font-size="11" text-anchor="middle" fill="#3C4858">CDP 127.0.0.1:9222，仅回环</text>
+    <text x="570" y="721" font-size="11" text-anchor="middle" fill="#3C4858">隔离 profile，用户手动登录</text>
+    <text x="570" y="740" font-size="10" text-anchor="middle" fill="#6B7280">[进程]</text>
+
+    <rect x="880" y="660" width="200" height="90" rx="4" fill="#EEF0F3" stroke="#3C4858" stroke-width="1.5"/>
+    <text x="980" y="688" font-size="13" font-weight="600" text-anchor="middle">默认浏览器</text>
+    <text x="980" y="706" font-size="11" text-anchor="middle" fill="#3C4858">打开 panel/latest.html</text>
+    <text x="980" y="740" font-size="10" text-anchor="middle" fill="#6B7280">[进程]</text>
+
+    <line x1="220" y1="45" x2="268" y2="45" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/>
+    <text x="244" y="37" font-size="10" text-anchor="middle" fill="#3C4858">读</text>
+    <line x1="220" y1="70" x2="558" y2="138" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/>
+    <text x="330" y="118" font-size="11" fill="#3C4858">subprocess；读 stdout JSON</text>
+    <line x1="120" y1="90" x2="120" y2="638" stroke="#2F3640" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#ar)"/>
+    <text x="130" y="380" font-size="11" fill="#3C4858">写候选 JSON</text>
+    <text x="130" y="396" font-size="11" fill="#6B7280">（激活只经 CLI：</text>
+    <text x="130" y="412" font-size="11" fill="#6B7280">validate / register）</text>
+
+    <line x1="600" y1="516" x2="220" y2="680" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/>
+    <text x="330" y="600" font-size="11" fill="#3C4858">store：SQLite 读写</text>
+    <line x1="700" y1="312" x2="570" y2="658" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/>
+    <text x="640" y="620" font-size="11" fill="#3C4858">adapter/launcher → vendor 原语 → CDP</text>
+    <line x1="980" y1="516" x2="980" y2="658" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/>
+    <text x="990" y="590" font-size="11" fill="#3C4858">panel：open file://</text>
+
+    <text x="560" y="612" font-size="10" fill="#6B7280">依赖方向：cli → service → {policy, adapter, launcher, normalize, rules, validate, panel, importer} → {store, vendor} → config；禁止反向。只有 store import sqlite3。</text>
+  </svg>
+</div>
+</x-dc>
+</body>
+</html>

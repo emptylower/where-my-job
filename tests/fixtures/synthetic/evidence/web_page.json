@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "job_id": "boss:SYN0001aaaa",
+  "kind": "web_page",
+  "url": "https://example.com/synthetic-company/news/2026-09",
+  "captured_at": "2026-09-14T10:00:00Z",
+  "published_at": "2026-09-01T09:30:00+08:00",
+  "excerpt": "合成科技一号宣布组建 AI 产品团队，计划年内扩招。",
+  "structured": {"headline": "合成科技一号扩招 AI 产品团队"},
+  "source_note": "agent 用 WebFetch 读取公司新闻页（合成示例）",
+  "idempotency_key": "syn-ev-web-0001"
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "job_id": "boss:SYN0001aaaa",
+  "bundle_id": "__BUNDLE_ID__",
+  "extra_evidence_ids": [],
+  "profile_revision": "example-minimal-v1",
+  "idempotency_key": "syn-rpt-opposing-1",
+  "authentic": {
+    "facts": [{"evidence_id": "__DETAIL_EVIDENCE_ID__", "claim": "详情页职责只有笼统描述，未列具体产品"}],
+    "supporting": [],
+    "opposing": [{"evidence_id": "__DETAIL_EVIDENCE_ID__", "claim": "职责描述笼统且未列团队或产品，难以支持当前有明确招聘需求"}],
+    "unknowns": ["未取得支持当前招聘意向的线索；展示持续性与当前招聘意向需分开判断"],
+    "conclusion": "倾向长期挂岗",
+    "conclusion_label": "推断"
+  },
+  "jd_translation": {"sentences": [
+    {"original": "负责公司 AI 相关产品工作", "explanation": "职责范围未限定到具体产品线",
+     "assumption": "可能是通用岗位描述，实际职责需面试确认"}
+  ]},
+  "mismatches": [
+    {"requirement": "产品岗位经验（JD 未写年限）", "profile": "约 3 年芯片 QC", "severity": "unknown",
+     "assumption": "JD 未给出明确年限要求"}
+  ],
+  "resume_advice": {
+    "proven": ["说明在 QC 流程中定义检查项与验收口径的经历"],
+    "to_reach": ["准备一个 AI 产品需求文档样例（尚未具备，不得写成已有经历）"]
+  },
+  "report_md": "## 招聘信号判断\n事实：职责描述笼统。\n支持：未取得支持线索。\n反对：职责未列团队或产品。\n未知：当前招聘意向未核验，展示持续性与招聘意向分开判断。\n定性倾向（推断）：倾向长期挂岗。\n\n## JD 翻译\n负责公司 AI 相关产品工作：范围未限定，可能是通用描述。\n\n## 不匹配点\nJD 未写年限；画像无产品岗经历。\n\n## 简历建议\n已证实经历如何表达：说明定义检查项与验收口径的经历。\n要达标还需补的行动：准备 AI 产品需求文档样例，不写成已有经历。\n"
+}

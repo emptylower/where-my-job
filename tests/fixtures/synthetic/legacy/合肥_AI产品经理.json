@@ -1,0 +1,31 @@
+{
+  "keyword": "AI产品经理",
+  "city": "合肥",
+  "filters": {},
+  "filter_desc": [],
+  "scraped_at": "2026-09-14T11:19:31.241776",
+  "total": 3,
+  "jobs": [
+    {"title": "AI产品经理", "salary": "15-25K·14薪", "salary_source": "api", "location": "合肥·蜀山区·政务区",
+     "tags": "1-3年 | 本科", "boss_name": "合成科技一号", "boss_title": "产品总监", "boss_active_status": "在线",
+     "company_scale": "100-499人", "company_stage": "A轮", "company_industry": "人工智能",
+     "job_labels": "1-3年 | 本科", "skills": "AI产品 | Agent | B端产品", "security_id": "SYN-SECURITY-1",
+     "lid": "SYN.lid.1", "encrypt_job_id": "SYN0001aaaa", "encrypt_boss_id": "SYNBOSS1", "encrypt_brand_id": "SYNCO1",
+     "job_link": "https://www.zhipin.com/job_detail/SYN0001aaaa.html", "company_link": "https://www.zhipin.com/gongsi/SYNCO1.html",
+     "welfare": "五险一金 | 年终奖", "job_id": "0000000000000001"},
+    {"title": "产品经理（校招）", "salary": "8-12K", "salary_source": "api", "location": "合肥··",
+     "tags": "在校/应届 | 硕士", "boss_name": "合成科技二号", "boss_title": "HR", "boss_active_status": "",
+     "company_scale": "1000-9999人", "company_stage": "已上市", "company_industry": "互联网",
+     "job_labels": "在校/应届 | 硕士", "skills": "", "security_id": "SYN-SECURITY-2",
+     "lid": "SYN.lid.2", "encrypt_job_id": "SYN0002bbbb", "encrypt_boss_id": "SYNBOSS2", "encrypt_brand_id": "SYNCO2",
+     "job_link": "https://www.zhipin.com/job_detail/SYN0002bbbb.html", "company_link": "https://www.zhipin.com/gongsi/SYNCO2.html",
+     "welfare": "", "job_id": "0000000000000002"},
+    {"title": "AI 训练师（日结）", "salary": "300-400元/天", "salary_source": "api", "location": "合肥·包河区",
+     "tags": "经验不限 | 大专", "boss_name": "合成科技三号", "boss_title": "招聘专员", "boss_active_status": "刚刚活跃",
+     "company_scale": "20-99人", "company_stage": "未融资", "company_industry": "数据服务",
+     "job_labels": "经验不限 | 大专", "skills": "数据标注", "security_id": "SYN-SECURITY-3",
+     "lid": "SYN.lid.3", "encrypt_job_id": "SYN0003cccc", "encrypt_boss_id": "SYNBOSS3", "encrypt_brand_id": "",
+     "job_link": "https://www.zhipin.com/job_detail/SYN0003cccc.html", "company_link": "",
+     "welfare": "", "job_id": "0000000000000003"}
+  ]
+}

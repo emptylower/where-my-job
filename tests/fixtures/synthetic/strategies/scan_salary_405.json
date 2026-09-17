@@ -1,0 +1,4 @@
+{"schema_version": 1, "name": "薪资区间展开",
+ "searches": [{"keywords": ["AI产品经理"], "cities": ["合肥"], "pages": 1,
+               "boss_filters": {"salary": ["405", "20-50K"], "experience": "经验不限"}}],
+ "budget": {"max_pages_per_run": 10, "pause_between_actions_sec": [12, 22]}}

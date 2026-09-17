@@ -1,0 +1,42 @@
+{
+  "schema_version": 2,
+  "profile_revision": "synthetic-qc-to-aipm-v1",
+  "campus_policy": "auto",
+  "experience_allowlist": ["经验不限", "1-3年", "3-5年"],
+  "classify": [
+    {"dir": "AI产品经理",
+     "when": {"all": [{"field": "title", "match": "产品经理|产品负责人"},
+                      {"field": "title_skills", "match": "AI|人工智能|大模型|Agent|智能", "flags": "i"}]}}
+  ],
+  "exclude": [
+    {"id": "degree-limit",
+     "when": {"field": "degree", "in": ["硕士", "博士"]},
+     "reason": "当前画像未提供该学历资格，需按明确要求核实"},
+    {"id": "experience-limit",
+     "when": {"all": [{"not": {"field": "exp", "in": ["经验不限", "1-3年", "3-5年"]}},
+                      {"not": {"field": "exp", "in": ["在校生", "应届生", "在校/应届"]}}]},
+     "reason": "不在本次选择的经验范围内；校园标签由校园政策单独处理"}
+  ],
+  "score": {
+    "AI产品经理": {
+      "base": 60,
+      "base_reason": "本次优先探索方向",
+      "rules": [
+        {"id": "agent-interest", "when": {"field": "title_skills", "match": "Agent|智能体", "flags": "i"},
+         "add": 12, "reason": "符合用户的主题偏好；具体职责及编码要求待 JD 核实"},
+        {"id": "llm-native", "when": {"field": "title_skills", "match": "大模型|LLM|多模态", "flags": "i"},
+         "add": 10, "reason": "岗位描述提到大模型方向，与用户的转型目标一致"},
+        {"id": "b-side", "when": {"field": "title_skills", "match": "B端|平台|中台|工作流", "flags": "i"},
+         "add": 8, "reason": "用户过往为 B 端流程经验，迁移成本较低"},
+        {"id": "quality-background", "when": {"field": "title_skills", "match": "质量|评测|标注", "flags": "i"},
+         "add": 6, "reason": "与用户既有质量管理背景直接相关"}
+      ]
+    }
+  },
+  "global": [
+    {"id": "preferred-city", "when": {"field": "city", "eq": "合肥"}, "add": 3, "reason": "符合本次城市偏好"},
+    {"id": "second-city", "when": {"field": "city", "eq": "深圳"}, "add": 2, "reason": "次选城市，可接受"}
+  ],
+  "tiers": {"S": 90, "A": 75, "B": 62, "C": 40},
+  "fallback_tier": "D"
+}

@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: "IBM Plex Sans", "PingFang SC", "Noto Sans SC", system-ui, sans-serif; color: #1E2229; }
+    a { color: #1F6F78; } a:hover { color: #164F56; }
+    .mono { font-family: "IBM Plex Mono", "PingFang SC", Menlo, monospace; }
+    td, th { padding: 5px 8px; border: 1px solid #D5D8DD; vertical-align: top; }
+    th { background: #F0F2F5; text-align: left; font-weight: 600; }
+  </style>
+</helmet>
+<div style="width: 1200px; height: 1000px; box-sizing: border-box; background: #FFFFFF; padding: 32px 40px; display: flex; flex-direction: column; gap: 12px;">
+  <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #D5D8DD; padding-bottom: 10px;">
+    <div style="font-size: 20px; font-weight: 600;">P3 · 非功能需求与风险登记（设计 v3 §2、§5、§11–§13）</div>
+    <div style="font-size: 12px; color: #6B7280;">概率 / 影响：高 中 低。缓解只写 CLI 能强制执行的部分</div>
+  </div>
+  <div style="font-size: 13px; font-weight: 600;">非功能需求</div>
+  <table style="border-collapse: collapse; width: 100%; font-size: 11px;">
+    <thead><tr><th style="width: 40px;">ID</th><th style="width: 110px;">需求</th><th>指标 / 承诺范围</th><th>实现手段</th><th style="width: 170px;">验证方式</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">N1</td><td>隐私边界（诚实版）</td><td>CLI 无遥测、本地存储、不读简历、不持凭证；raw/画像/导航关联字段不出视图与 stdout。不承诺 agent 出站</td><td>视图白名单；证据包最小化；`--local-out` 才写全文；访谈前告知边界</td><td>网络监听 + 输出扫描</td></tr>
+      <tr><td class="mono">N2</td><td>网络门禁</td><td>统一门禁覆盖 scan/deepdive/probe；每 run ≤80 页；滚动 24h ≤80 动作；间隔 ≥12s；风控 → 冷却 ≥4h；同 profile 单锁</td><td>policy 预占动作、持久账本、逐响应判定；validate 硬上限；不按 cwd 新开额度</td><td>离线注入第二页 31/37 无第三次导航；串行重跑累计</td></tr>
+      <tr><td class="mono">N3</td><td>可复跑</td><td>同输入版本（事实+画像+scoring+引擎+as_of）重算结果一致；match 批次原子</td><td>match_results 事务切换；raw 保留；策略快照入 runs</td><td>两次 match 差异为空</td></tr>
+      <tr><td class="mono">N4</td><td>可解释可追溯</td><td>分数由 base+贡献重求和；结论有证据引用；报告与包版本绑定</td><td>reasons_json；evidence_id 引用校验；bundle 不可变</td><td>抽查 + 引用可定位测试</td></tr>
+      <tr><td class="mono">N5</td><td>可离线测试</td><td>除真实集成外全部可无网络运行；CI 禁外网</td><td>合成 fixtures；可注入时钟/随机/适配；纯函数分层</td><td>CI 无网络通过</td></tr>
+      <tr><td class="mono">N6</td><td>安装与首用</td><td>clone → 合成 demo 面板 ≤30 分钟；真实单页另计并记录登录耗时</td><td>uv tool install；任意 cwd；根目录 SKILL.md；demo 先行</td><td>非作者干净环境计时</td></tr>
+      <tr><td class="mono">N7</td><td>性能目标</td><td>5000 岗 match &lt;2s；默认面板 &lt;3s；固定查询报告截断</td><td>SQLite 索引；固定视图；受限 worker 超时</td><td>磁盘临时库 5000 岗 / 30 万标注</td></tr>
+      <tr><td class="mono">N8</td><td>接口脆弱容忍</td><td>响应/页面变化时不丢已采数据、解析字段可为 unknown、不用 DOM 薪资冒充明文</td><td>typed 响应；未知 → 停止计划、partial；原文列保留</td><td>删改 fixtures 字段回归</td></tr>
+      <tr><td class="mono">N9</td><td>数据发行</td><td>公开制品零真实岗位/画像/导航关联值；真实回归只走私有 manifest</td><td>allowlist 打包；发布前负面扫描</td><td>扫描通过为发布门槛</td></tr>
+    </tbody>
+  </table>
+  <div style="font-size: 13px; font-weight: 600;">风险登记</div>
+  <table style="border-collapse: collapse; width: 100%; font-size: 11px;">
+    <thead><tr><th style="width: 40px;">ID</th><th style="width: 230px;">风险</th><th style="width: 46px;">概率</th><th style="width: 46px;">影响</th><th>缓解（CLI 可强制的部分）</th><th style="width: 150px;">触发信号 / 能力边界</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">R1</td><td>BOSS 改接口或页面结构</td><td>高</td><td>高</td><td>adapter 只依赖被动捕获与允许 URL 校验；typed unknown 停止计划不探测；raw 保留可回溯；vendor 版本固定并记录</td><td>捕获为空、字段缺失率上升</td></tr>
+      <tr><td class="mono">R2</td><td>账号触发风控甚至封禁</td><td>中</td><td>高</td><td>N2 全部；不做自动投递；速率是保守产品策略，不是平台安全保证</td><td>31/37、验证码页。用户承担账号风险</td></tr>
+      <tr><td class="mono">R3</td><td>平台协议 / 法律适用</td><td>中</td><td>高</td><td>不做服务端、不汇聚、不商用；在线功能发布前核验当时协议并记录；删除"本地即合法"推断</td><td>协议未核验 = 在线发布门槛未过</td></tr>
+      <tr><td class="mono">R4</td><td>agent 绕过 CLI（直接 CDP/网络/读私有目录）</td><td>中</td><td>中</td><td>CLI 只能对经自身接口的动作硬执行门禁；更强保证需 agent 运行时能力限制</td><td>能力边界：外部运行环境职责</td></tr>
+      <tr><td class="mono">R5</td><td>证据/JD 中的提示注入</td><td>中</td><td>中</td><td>证据标不可信；只从合法 ID 构造导航目标；报告禁原始 HTML；链接协议白名单；SKILL.md 铁律 5</td><td>恶意样本测试</td></tr>
+      <tr><td class="mono">R6</td><td>CDP 调试端口暴露登录态</td><td>低</td><td>高</td><td>自有启动器不带 --remote-allow-origins=*；校验仅回环与归属；browser stop；不拷贝主 Chrome Cookie</td><td>非回环监听 → 拒绝连接（2）</td></tr>
+      <tr><td class="mono">R7</td><td>真实数据/画像进入公开仓库或制品</td><td>中</td><td>高</td><td>N9；examples 全合成；私有回归不复制进仓库</td><td>负面扫描命中</td></tr>
+      <tr><td class="mono">R8</td><td>列表 API 真招字段名与假设不符</td><td>中</td><td>低</td><td>未核验字段不参与规则；raw 已存随时补；首次真实验证后固定适配器版本</td><td>T13 结果</td></tr>
+      <tr><td class="mono">R9</td><td>agent 生成的 scoring 不贴合用户</td><td>中</td><td>中</td><td>scoring-schema 给推导方法；reasons 可解释；改一处重算；任务式验收（前十岗理由、红线漏筛）</td><td>用户反馈</td></tr>
+      <tr><td class="mono">R10</td><td>四周排期乐观（采集适配、两页解析）</td><td>中</td><td>中</td><td>T1 冻结协议；T3 离线风控样本放第一周；范围已收缩；未过联网门槛只发离线 beta</td><td>D5 未冻结、D14 未完成详情解析</td></tr>
+      <tr><td class="mono">R11</td><td>报告结论超出证据（概率、养鱼定性）</td><td>中</td><td>中</td><td>三值结论 + 推断标注；信号可空、两侧皆空须证据不足；面板只陈述观察跨度事实</td><td>report set 校验；人工抽查</td></tr>
+    </tbody>
+  </table>
+</div>
+</x-dc>
+</body>
+</html>

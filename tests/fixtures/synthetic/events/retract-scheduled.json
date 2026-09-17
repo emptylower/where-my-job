@@ -1,0 +1,4 @@
+{"schema_version": 1, "stream": "custom.interviews", "stream_revision": 1, "type": "corrected", "subject_kind": "application",
+ "subject_id": "APP_ID_PLACEHOLDER", "occurred_at": "2026-09-11T12:00:00+08:00", "payload": {},
+ "idempotency_key": "syn-retract-0001", "origin": "user",
+ "corrected": {"corrected_event_id": "EVENT_ID_PLACEHOLDER", "op": "retract"}}

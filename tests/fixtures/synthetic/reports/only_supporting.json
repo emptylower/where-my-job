@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "job_id": "boss:SYN0001aaaa",
+  "bundle_id": "__BUNDLE_ID__",
+  "extra_evidence_ids": [],
+  "profile_revision": "example-minimal-v1",
+  "idempotency_key": "syn-rpt-supporting-1",
+  "authentic": {
+    "facts": [{"evidence_id": "__DETAIL_EVIDENCE_ID__", "claim": "详情页 JD 含 5 条职责与 4 条要求"}],
+    "supporting": [{"evidence_id": "__DETAIL_EVIDENCE_ID__", "claim": "招聘者头衔为产品总监，与岗位方向一致"}],
+    "opposing": [],
+    "unknowns": ["未取得反对线索；没有反对线索不代表反对证据不存在"],
+    "conclusion": "倾向真实在招",
+    "conclusion_label": "推断"
+  },
+  "jd_translation": {"sentences": [
+    {"original": "负责 AI 产品从 0 到 1", "explanation": "需要独立推进一个新产品线",
+     "evidence_id": "__DETAIL_EVIDENCE_ID__", "assumption": "JD 未说明是否包含算法实现"}
+  ]},
+  "mismatches": [
+    {"requirement": "3 年产品经验", "profile": "约 3 年芯片 QC，无产品岗经历", "severity": "high",
+     "evidence_id": "__DETAIL_EVIDENCE_ID__"}
+  ],
+  "resume_advice": {
+    "proven": ["把 QC 签核流程改进写成需求定义与验收标准的经历"],
+    "to_reach": ["补一个可演示的 AI 产品案例（尚未具备，不得写成已有经历）"]
+  },
+  "report_md": "## 招聘信号判断\n事实：详情页 JD 含 5 条职责与 4 条要求。\n支持：招聘者头衔为产品总监。\n反对：未取得反对线索。\n未知：公司页计数未核验。\n定性倾向（推断）：倾向真实在招。\n\n## JD 翻译\n负责 AI 产品从 0 到 1：需要独立推进新产品线；是否含算法实现未说明。\n\n## 不匹配点\n要求 3 年产品经验；画像为约 3 年芯片 QC，无产品岗经历。\n\n## 简历建议\n已证实经历如何表达：把 QC 签核流程改进写成需求定义与验收标准。\n要达标还需补的行动：做一个可演示的 AI 产品案例，不写成已有经历。\n"
+}

@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "title": "合成数据演示 — where-my-job",
+  "columns": [
+    "tier",
+    "score",
+    "dir",
+    "title",
+    "company_name",
+    "city",
+    "salary_text",
+    "exp",
+    "degree",
+    "report_state",
+    "application_state",
+    "job_url"
+  ],
+  "sort": {
+    "by": "score",
+    "desc": true
+  },
+  "filters": [
+    {
+      "column": "excluded",
+      "op": "=",
+      "value": 0
+    },
+    {
+      "column": "match_state",
+      "op": "=",
+      "value": "current"
+    }
+  ],
+  "charts": [
+    {
+      "type": "bar",
+      "by": "dir"
+    },
+    {
+      "type": "bar",
+      "by": "tier"
+    }
+  ],
+  "timeline": {
+    "enabled": true,
+    "streams": [
+      "applications"
+    ]
+  },
+  "page_size": 200
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "profile_revision": "synthetic-qc-to-aipm-v1",
+  "summary": "合成画像：有芯片 QC 流程经验，希望尝试 AI 产品方向；技能均为自述，待具体岗位核验。",
+  "skills": [
+    {
+      "name": "需求拆解与验收",
+      "level": "working"
+    },
+    {
+      "name": "Agent 工具使用",
+      "level": "working"
+    }
+  ],
+  "targets": {
+    "directions": [
+      "AI产品经理"
+    ],
+    "cities": [
+      "合肥"
+    ],
+    "experience_scope": [
+      "经验不限",
+      "1-3年"
+    ]
+  },
+  "redlines": [
+    "明确要求硕士及以上"
+  ],
+  "notes": "合成示例，非真实用户。"
+}

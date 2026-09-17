@@ -1,0 +1,174 @@
+{
+  "pages": [
+    {
+      "id": "structure",
+      "name": "1 结构视图"
+    },
+    {
+      "id": "data-behavior",
+      "name": "2 数据与行为"
+    },
+    {
+      "id": "plan",
+      "name": "3 计划与治理"
+    }
+  ],
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "page": "structure",
+      "x": 0,
+      "y": 0,
+      "w": 1200,
+      "h": 800,
+      "title": "C1 系统上下文"
+    },
+    {
+      "file": "Containers.dc.html",
+      "page": "structure",
+      "x": 1320,
+      "y": 0,
+      "w": 1200,
+      "h": 900,
+      "title": "C2 容器与组件"
+    },
+    {
+      "file": "Deployment.dc.html",
+      "page": "structure",
+      "x": 0,
+      "y": 1040,
+      "w": 1200,
+      "h": 760,
+      "title": "C3 部署"
+    },
+    {
+      "file": "Modules.dc.html",
+      "page": "structure",
+      "x": 1320,
+      "y": 1040,
+      "w": 1200,
+      "h": 1180,
+      "title": "C4 模块结构"
+    },
+    {
+      "file": "ERDiagram.dc.html",
+      "page": "data-behavior",
+      "x": 0,
+      "y": 0,
+      "w": 1200,
+      "h": 1020,
+      "title": "D1 实体关系"
+    },
+    {
+      "file": "DataFlow.dc.html",
+      "page": "data-behavior",
+      "x": 1320,
+      "y": 0,
+      "w": 1200,
+      "h": 840,
+      "title": "D2 数据流"
+    },
+    {
+      "file": "States.dc.html",
+      "page": "data-behavior",
+      "x": 2640,
+      "y": 0,
+      "w": 1200,
+      "h": 840,
+      "title": "D3 状态机"
+    },
+    {
+      "file": "SeqOnboarding.dc.html",
+      "page": "data-behavior",
+      "x": 0,
+      "y": 1140,
+      "w": 1200,
+      "h": 1020,
+      "title": "S1 时序 首次使用"
+    },
+    {
+      "file": "SeqDeepdive.dc.html",
+      "page": "data-behavior",
+      "x": 1320,
+      "y": 1140,
+      "w": 1200,
+      "h": 1020,
+      "title": "S2 时序 点名深挖"
+    },
+    {
+      "file": "SeqExtension.dc.html",
+      "page": "data-behavior",
+      "x": 2640,
+      "y": 1140,
+      "w": 1200,
+      "h": 920,
+      "title": "S3 时序 事件流"
+    },
+    {
+      "file": "Gantt.dc.html",
+      "page": "plan",
+      "x": 0,
+      "y": 0,
+      "w": 1200,
+      "h": 860,
+      "title": "P1 甘特图"
+    },
+    {
+      "file": "CLIContract.dc.html",
+      "page": "plan",
+      "x": 1320,
+      "y": 0,
+      "w": 1200,
+      "h": 1060,
+      "title": "P2 CLI 接口契约"
+    },
+    {
+      "file": "Risks.dc.html",
+      "page": "plan",
+      "x": 0,
+      "y": 1200,
+      "w": 1200,
+      "h": 1000,
+      "title": "P3 非功能与风险"
+    },
+    {
+      "file": "Roadmap.dc.html",
+      "page": "plan",
+      "x": 1320,
+      "y": 1200,
+      "w": 1200,
+      "h": 900,
+      "title": "P4 范围与路线图"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "guide-structure",
+      "page": "structure",
+      "x": 0,
+      "y": -150,
+      "w": 640,
+      "text": "设计 v3（Claude × Codex 四轮评审收敛）。阅读顺序：C1 上下文 → C2 容器/组件 → C3 部署 → C4 模块。\n对应 docs/superpowers/specs/2026-09-14-where-my-job-design-v3.md §3、§9、§11。"
+    },
+    {
+      "id": "guide-data",
+      "page": "data-behavior",
+      "x": 0,
+      "y": -150,
+      "w": 640,
+      "text": "D1 ER（15 表）→ D2 数据流 → D3 四个状态机 → S1/S2/S3 时序。\n对应设计 v3 §4、§7、§8、§12。"
+    },
+    {
+      "id": "guide-plan",
+      "page": "plan",
+      "x": 0,
+      "y": -150,
+      "w": 640,
+      "text": "P1 甘特 → P2 CLI 契约 → P3 NFR/风险 → P4 范围/里程碑/ADR/开放问题。\n对应设计 v3 §5、§8、§10、§13、§14。"
+    }
+  ],
+  "launch": {
+    "view": "canvas",
+    "page": "structure"
+  }
+}

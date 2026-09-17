@@ -1,0 +1,14 @@
+{"code": 0, "message": "Success", "zpData": {"hasMore": true, "jobList": [
+  {"encryptJobId": "SYN0101aaaa", "jobName": "AI产品经理", "salaryDesc": "15-25K·14薪", "cityName": "合肥",
+   "areaDistrict": "蜀山区", "businessDistrict": "政务区", "jobExperience": "1-3年", "jobDegree": "本科",
+   "brandName": "合成科技一号", "bossTitle": "产品总监", "bossOnline": true, "brandScaleName": "100-499人",
+   "brandStageName": "A轮", "brandIndustry": "人工智能", "jobLabels": ["1-3年", "本科"],
+   "skills": ["AI产品", "Agent"], "welfareList": ["五险一金"], "securityId": "SYN-SECURITY-101",
+   "lid": "SYN.lid.101", "encryptBossId": "SYNBOSS101", "encryptBrandId": "SYNCO1"},
+  {"encryptJobId": "SYN0102bbbb", "jobName": "产品经理（校招）", "salaryDesc": "8-12K", "cityName": "合肥",
+   "areaDistrict": "", "businessDistrict": "", "jobExperience": "在校/应届", "jobDegree": "硕士",
+   "brandName": "合成科技二号", "bossTitle": "HR", "bossOnline": false, "brandScaleName": "1000-9999人",
+   "brandStageName": "已上市", "brandIndustry": "互联网", "jobLabels": ["在校/应届", "硕士"],
+   "skills": [], "welfareList": [], "securityId": "SYN-SECURITY-102", "lid": "SYN.lid.102",
+   "encryptBossId": "SYNBOSS102", "encryptBrandId": "SYNCO2"}
+]}}

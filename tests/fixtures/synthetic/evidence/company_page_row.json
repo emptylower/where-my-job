@@ -1,0 +1,14 @@
+{
+  "kind": "company_page",
+  "url": "https://www.zhipin.com/gongsi/SYNCO1.html",
+  "captured_at": "2026-09-14T09:01:00Z",
+  "excerpt": "合成科技一号 · 人工智能 · 100-499人 · A轮",
+  "full_text": "合成科技一号公司页全文（合成）。在招职位 12，招聘者 3。",
+  "structured": {
+    "job_count_raw": "在招职位 12", "boss_count_raw": "招聘者 3",
+    "job_count": 12, "boss_count": 3,
+    "industry": "人工智能", "scale": "100-499人", "stage": "A轮"
+  },
+  "parser_version": "company-v1",
+  "completeness": "complete"
+}

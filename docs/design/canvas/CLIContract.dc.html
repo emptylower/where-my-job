@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: "IBM Plex Sans", "PingFang SC", "Noto Sans SC", system-ui, sans-serif; color: #1E2229; }
+    a { color: #1F6F78; } a:hover { color: #164F56; }
+    .mono { font-family: "IBM Plex Mono", "PingFang SC", Menlo, monospace; }
+    td, th { padding: 5px 8px; border: 1px solid #D5D8DD; vertical-align: top; }
+    th { background: #F0F2F5; text-align: left; font-weight: 600; }
+  </style>
+</helmet>
+<div style="width: 1200px; height: 1060px; box-sizing: border-box; background: #FFFFFF; padding: 32px 40px; display: flex; flex-direction: column; gap: 12px;">
+  <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #D5D8DD; padding-bottom: 10px;">
+    <div style="font-size: 20px; font-weight: 600;">P2 · CLI 接口契约（设计 v3 §8）</div>
+    <div style="font-size: 12px; color: #6B7280;">所有命令支持 --json：stdout 只有一个 envelope 对象；日志与进度到 stderr；所有输入在使用时强制校验</div>
+  </div>
+  <table style="border-collapse: collapse; width: 100%; font-size: 11px;">
+    <thead><tr><th style="width: 60px;">组</th><th style="width: 330px;">命令</th><th>作用与边界</th><th style="width: 70px;">退出码</th></tr></thead>
+    <tbody>
+      <tr><td>环境</td><td class="mono">init [--browser] [--probe]</td><td>默认仅本地：依赖、目录、迁移。--browser 由 launcher 拉起专用空白 Chrome，用户手动登录。--probe 是显式且受门禁的主动探测</td><td>0/1/2/3</td></tr>
+      <tr><td></td><td class="mono">status [--json]</td><td>数据/评分/报告状态、任务统计、锁、预算、冷却到期、保留策略与体积；仅本地读取</td><td>0</td></tr>
+      <tr><td></td><td class="mono">browser stop</td><td>只停止本工具验证归属的专用浏览器，关闭调试入口</td><td>0/2</td></tr>
+      <tr><td>数据</td><td class="mono">import FILES... [--manifest F]</td><td>显式清单；legacy_mapped 标记；(file_sha256,item_index) 幂等；来源时间与时区假设记录；不导入分数</td><td>0/1/4</td></tr>
+      <tr><td></td><td class="mono">scan --strategy F [--dry-run]</td><td>展开并校验任务计划（超 80 页或额度不足直接报错）；受控列表采集；逐响应判风控；逐条落库。dry-run 不访问 BOSS</td><td>0/1/2/3/4</td></tr>
+      <tr><td></td><td class="mono">deepdive JOB_ID [--cached] [--skip-company]</td><td>持锁采集两页或读缓存包；创建 evidence 与不可变 bundle；返回 bundle_id 与 acquisition_state；skip-company 显示公司页未采集</td><td>0/1/2/3/4</td></tr>
+      <tr><td></td><td class="mono">evidence add JOB_ID --file F</td><td>校验并保存站外/用户证据；origin 默认 agent，不信任自报 cli；无 URL 须 kind=user_statement</td><td>0/1</td></tr>
+      <tr><td></td><td class="mono">evidence list/show ID [--local-out F]</td><td>受限字段与摘录；完整原文只写显式本地文件，stdout 只给路径</td><td>0/1</td></tr>
+      <tr><td>匹配</td><td class="mono">match [--scoring F] [--as-of T]</td><td>固定快照计算，事务提交一个 match_run；失败保留旧批次</td><td>0/1</td></tr>
+      <tr><td>标注</td><td class="mono">attr set/get/list/unset</td><td>priority / note / score_adjustment / custom.*；source agent|user；保留名不能绕过 report/match 协议</td><td>0/1</td></tr>
+      <tr><td>报告</td><td class="mono">report set JOB_ID --file F</td><td>结构化报告一次事务提交：bundle_id、证据引用、三值结论、可空信号数组、非空 Markdown、幂等键；两项标注由报告投影</td><td>0/1</td></tr>
+      <tr><td></td><td class="mono">report get JOB_ID [--report-id ID]</td><td>当前或历史报告、绑定证据、report_state 与过期状态</td><td>0/1</td></tr>
+      <tr><td>事件</td><td class="mono">event add --file F</td><td>文件含流、绑定版本、类型、主体、payload、幂等键；首次 applied 同事务建身份；corrected 为保留控制类型（replace/retract）</td><td>0/1</td></tr>
+      <tr><td></td><td class="mono">event list --stream S [--subject ID] [--history]</td><td>有效时间线；--history 含纠错与撤销记录</td><td>0/1</td></tr>
+      <tr><td></td><td class="mono">stream register --file F / list / show S [--revision N]</td><td>register 校验并激活不可变版本；validate 不激活；升版只增不改</td><td>0/1</td></tr>
+      <tr><td>查询</td><td class="mono">job list [--filter K=V ...] [--sort] [--page] / job show JOB_ID</td><td>固定参数的公开字段读取、筛选、分页；用户输入不成为 SQL 片段。v1 无自由 SQL</td><td>0/1</td></tr>
+      <tr><td>展示</td><td class="mono">panel [--spec F] [--open] [--out F]</td><td>固定视图 + 类型化筛选 + 可选注册流时间线 tab；原子替换的自包含 HTML；无外部资源</td><td>0/1</td></tr>
+      <tr><td>校验</td><td class="mono">validate {profile,strategy,scoring,panel,evidence,report,event,stream,settings} F</td><td>JSON Schema + 语义错误（字段路径、允许值）；不采集、不激活</td><td>0/1</td></tr>
+      <tr><td>清理</td><td class="mono">data delete --job ID | --all [--dry-run] / data prune --raw-before T [--dry-run]</td><td>删除清理关联业务数据与受管派生产物；prune 用户显式触发、必须给时间参数、不自动调度；均不重置网络策略状态</td><td>0/1/2/4</td></tr>
+    </tbody>
+  </table>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+    <table style="border-collapse: collapse; width: 100%; font-size: 11px;">
+      <thead><tr><th style="width: 40px;">码</th><th>含义</th><th>agent 行为</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">0</td><td>所声明的本次操作完整成功；正常空结果也可成功</td><td>继续；采集成功 ≠ 分析完成</td></tr>
+        <tr><td class="mono">1</td><td>用法、配置、类型或语义校验失败</td><td>按字段路径修改后重试；命令仍会再校验</td></tr>
+        <tr><td class="mono">2</td><td>环境/依赖/本地资源：未登录、CDP 不通、端口归属错误、无写权限；采集失败且无任何有效结果时也按失败类别归此</td><td>告知修复步骤；不自动重复爬取</td></tr>
+        <tr><td class="mono">3</td><td>风控、冷却、滚动预算耗尽、浏览器会话被占用（RESOURCE_BUSY）</td><td>读细分 code；停止网络工作；不并发绕过；有部分数据也不降成 4</td></tr>
+        <tr><td class="mono">4</td><td>计划未完成或部分输入失败，但已保存部分有效结果</td><td>展示已完成/未完成；新尝试是新 run + parent_run，用户决定后再启动</td></tr>
+      </tbody>
+    </table>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <pre class="mono" style="margin: 0; font-size: 10.5px; line-height: 1.4; background: #F7F8FA; border: 1px solid #D5D8DD; border-radius: 4px; padding: 8px 10px;">{
+  "schema_version": 1, "command": "scan",
+  "status": "blocked", "exit_code": 3, "run_id": "…",
+  "data": {"planned": 2, "completed": 1, "saved_jobs": 30},
+  "errors": [{"code": "RISK_DETECTED", "path": "tasks[1]", "message": "…"}],
+  "warnings": [],
+  "retry": {"automatic": false, "not_before": "2026-09-15T00:00:00Z"}
+}</pre>
+      <div style="font-size: 11px; color: #3C4858; border-left: 3px solid #1F6F78; padding: 6px 10px; background: #F7F8FA; display: flex; flex-direction: column; gap: 4px;">
+        <div><span style="font-weight: 600;">run 终态</span>：ok / blocked / partial / failed / cancelled；处理中 running；遗留 running 在下次启动标 interrupted。</div>
+        <div><span style="font-weight: 600;">并发</span>：scan / deepdive / probe 共用一把按 canonical profile 的文件锁；只读命令可并发。</div>
+        <div><span style="font-weight: 600;">兼容</span>：命令名、参数名、退出码、envelope 顶层字段在 v1.x 内不变；data 按各命令 versioned schema。</div>
+        <div><span style="font-weight: 600;">输出体积</span>：证据包默认 ≤64KiB，省略 raw、security_id/lid、招聘者标识、profile 全文。</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

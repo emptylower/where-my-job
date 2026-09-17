@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "job_id": "boss:SYN0001aaaa",
+  "bundle_id": "__BUNDLE_ID__",
+  "extra_evidence_ids": [],
+  "profile_revision": "example-minimal-v1",
+  "idempotency_key": "syn-rpt-partial-1",
+  "authentic": {
+    "facts": [{"evidence_id": "__DETAIL_EVIDENCE_ID__", "claim": "只取得详情页，公司页未采集"}],
+    "supporting": [],
+    "opposing": [],
+    "unknowns": ["company_page: 未采集", "详情页未取得支持或反对线索"],
+    "conclusion": "证据不足",
+    "conclusion_label": "推断"
+  },
+  "jd_translation": {"sentences": [
+    {"original": "熟悉 Agent 工作流", "explanation": "需要理解工具之间的任务衔接",
+     "evidence_id": "__DETAIL_EVIDENCE_ID__"}
+  ]},
+  "mismatches": [
+    {"requirement": "岗位具体经验门槛", "profile": "画像只提供 QC 流程经历", "severity": "unknown",
+     "assumption": "公司页未采集，团队规模与门槛未知"}
+  ],
+  "resume_advice": {
+    "proven": ["按画像自述说明需求拆解与验收职责"],
+    "to_reach": ["补充可演示的 AI 工具项目（尚未具备）"]
+  },
+  "report_md": "## 招聘信号判断\n事实：只取得详情页。\n支持：未取得。\n反对：未取得。\n未知：公司页未采集。\n定性倾向（推断）：证据不足。\n\n## JD 翻译\n熟悉 Agent 工作流：需要理解工具间任务衔接。\n\n## 不匹配点\n经验门槛未知。\n\n## 简历建议\n已证实经历如何表达：说明需求拆解与验收职责。\n要达标还需补的行动：做可演示项目，不写成已有经历。\n"
+}

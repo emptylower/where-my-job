@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "profile_revision", "summary"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "profile_revision": {"type": "string", "minLength": 1},
+    "summary": {"type": "string", "minLength": 1, "maxLength": 2000},
+    "skills": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["name"],
+               "properties": {"name": {"type": "string", "minLength": 1}, "level": {"type": "string", "enum": ["familiar", "working", "proficient"]}}}},
+    "targets": {"type": "object", "additionalProperties": false,
+                "properties": {"directions": {"type": "array", "items": {"type": "string"}}, "cities": {"type": "array", "items": {"type": "string"}},
+                               "salary_floor_k": {"type": "number", "minimum": 0}, "experience_scope": {"type": "array", "items": {"type": "string"}}}},
+    "redlines": {"type": "array", "items": {"type": "string"}},
+    "notes": {"type": "string", "maxLength": 4000}
+  }
+}

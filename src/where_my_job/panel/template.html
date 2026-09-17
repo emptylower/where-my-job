@@ -1,0 +1,142 @@
+<!-- src/where_my_job/panel/template.html -->
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<title>{{TITLE}}</title>
+<style>
+/* 设计令牌：浅色为默认，深色在 media query 里整套重定义 */
+:root{
+  --bg:#F4F5F7; --card:#FFFFFF; --fg:#1F2430; --muted:#5B6472;
+  --line:#E2E5EA; --line-strong:#C6CDD6;
+  --acc:#2F6FED; --acc-soft:rgba(47,111,237,.10); --on-acc:#FFFFFF;
+  --hover:#F0F4FB; --chip:rgba(27,39,64,.06);
+  --warn-bg:#FFF8E6; --warn-line:#F0DFAF; --warn-fg:#7A5A00; --warn-acc:#E0A82E;
+  --tier-s-fg:#8A5A00; --tier-s-bg:#FBEFD2;
+  --tier-a-fg:#1D5FD6; --tier-a-bg:#E5EEFD;
+  --tier-b-fg:#0E7264; --tier-b-bg:#E1F3EE;
+  --tier-c-fg:#5B6472; --tier-c-bg:#EDEFF3;
+  --pagehead-h:55px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#12151A; --card:#1A1E25; --fg:#E2E6EC; --muted:#98A1AD;
+    --line:#2B313B; --line-strong:#3A424E;
+    --acc:#6EA8FE; --acc-soft:rgba(110,168,254,.15); --on-acc:#0E1420;
+    --hover:rgba(255,255,255,.05); --chip:rgba(255,255,255,.07);
+    --warn-bg:rgba(224,168,46,.10); --warn-line:rgba(224,168,46,.32); --warn-fg:#EEC26A; --warn-acc:#D9A431;
+    --tier-s-fg:#F2C14E; --tier-s-bg:rgba(242,193,78,.13);
+    --tier-a-fg:#8FB3FF; --tier-a-bg:rgba(110,168,254,.15);
+    --tier-b-fg:#5FD3BC; --tier-b-bg:rgba(95,211,188,.13);
+    --tier-c-fg:#A7AEBA; --tier-c-bg:rgba(167,174,186,.16);
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.55 -apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;color:var(--fg);background:var(--bg)}
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px 40px}
+/* 吸顶页头：高度固定（标题与 meta 均单行），表头按其高度偏移 */
+.pagehead{position:sticky;top:0;z-index:40;display:flex;align-items:baseline;gap:16px;padding:16px 0 10px;background:var(--bg);border-bottom:1px solid var(--line)}
+h1{margin:0;font-size:20px;font-weight:650;line-height:1.4;white-space:nowrap}
+.meta{flex:1;min-width:0;overflow-x:auto;white-space:nowrap;scrollbar-width:none;color:var(--muted);font-size:12px}
+.meta span{margin-right:16px}
+h2{margin:16px 0 8px;font-size:15px;font-weight:600}
+a{color:var(--acc);text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.warn{margin:14px 0 0;padding:9px 12px;border:1px solid var(--warn-line);border-left:3px solid var(--warn-acc);border-radius:8px;background:var(--warn-bg);color:var(--warn-fg);font-size:13px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.tabs button{appearance:none;font:inherit;font-size:13px;line-height:1.45;padding:5px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--fg);cursor:pointer}
+.tabs button:hover{border-color:var(--acc);color:var(--acc)}
+.tabs button[aria-selected="true"]{background:var(--acc);border-color:var(--acc);color:var(--on-acc);font-weight:600}
+section[hidden],tr[hidden]{display:none}
+.charts{display:flex;flex-wrap:wrap;gap:14px;margin:0 0 14px}
+.chart{min-width:250px;max-width:100%;padding:12px 16px;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+.chart h2{margin:0 0 10px;font-size:13px;font-weight:600;color:var(--fg)}
+.bar{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:12px}
+.bar>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--fg)}
+.bar i{display:block;height:8px;min-width:2px;border-radius:999px;background:var(--acc);opacity:.85}
+.bar>span:last-child{color:var(--muted);font-variant-numeric:tabular-nums}
+.filters{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:0 0 12px}
+.filters label{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.filters select,.filters input{font:inherit;font-size:13px;line-height:1.4;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
+.filters select:hover,.filters input:hover{border-color:var(--line-strong)}
+.filters b{color:var(--fg);font-variant-numeric:tabular-nums}
+.note{margin:10px 0;color:var(--muted);font-size:12px}
+/* 主表卡片：桌面端不加 overflow，保住表头相对视口的 sticky；圆角由表头/末行单元格配合 */
+.table-wrap{border:1px solid var(--line);border-radius:10px;background:var(--card)}
+table{width:100%;border-collapse:separate;border-spacing:0;background:var(--card)}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:13px}
+th{position:sticky;top:var(--pagehead-h);z-index:10;background:var(--card);color:var(--muted);font-size:12px;font-weight:600;white-space:nowrap}
+thead th:first-child{border-top-left-radius:10px}
+thead th:last-child{border-top-right-radius:10px}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:last-child td:first-child{border-bottom-left-radius:10px}
+tbody tr:last-child td:last-child{border-bottom-right-radius:10px}
+tbody tr:hover td{background:var(--hover)}
+section[data-tab=excluded] table,section[data-tab=unknown] table,section[data-tab=timeline] table{border:1px solid var(--line);border-radius:10px}
+/* 数值列：右对齐 + 等宽数字 */
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+th[data-numeric="1"]{text-align:right}
+/* 长文本列：单行截断，全文在 title；多行理由列限三行 */
+td.clamp{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+td.nowrap{white-space:nowrap}
+td.clamp-multi{max-width:280px}
+td.clamp-multi .reasons{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+/* 可排序表头：指针之外的提示（悬停底色 + 排序方向符号） */
+#jobs th{cursor:pointer;user-select:none}
+#jobs th:hover{background:var(--hover)}
+#jobs th::after{content:"↕";margin-left:4px;font-size:10px;opacity:.25}
+#jobs th[aria-sort="ascending"]::after{content:"▲";opacity:1;color:var(--acc)}
+#jobs th[aria-sort="descending"]::after{content:"▼";opacity:1;color:var(--acc)}
+.tier-S,.tier-A,.tier-B,.tier-C{display:inline-block;min-width:1.3em;padding:0 7px;border-radius:999px;font-size:12px;font-weight:650;line-height:1.6;text-align:center}
+.tier-S{color:var(--tier-s-fg);background:var(--tier-s-bg)}
+.tier-A{color:var(--tier-a-fg);background:var(--tier-a-bg)}
+.tier-B{color:var(--tier-b-fg);background:var(--tier-b-bg)}
+.tier-C{color:var(--tier-c-fg);background:var(--tier-c-bg)}
+.reasons{color:var(--muted);font-size:12px;line-height:1.45}
+code{padding:1px 5px;border-radius:4px;background:var(--chip);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+.timeline-meta{margin:0 0 10px;padding:0;list-style:none;color:var(--muted);font-size:12px}
+section[data-tab]{padding-bottom:8px}
+.foot{margin-top:20px;padding-top:12px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+/* 窄屏：页头取消吸顶，表格在容器内横向滚动，页面自身不横滚 */
+@media (max-width:899px){
+  .wrap{padding:0 14px 28px}
+  .pagehead{position:static;flex-wrap:wrap;gap:4px 12px}
+  h1{white-space:normal}
+  .meta{white-space:normal;overflow:visible}
+  th{top:0}
+  .table-wrap{overflow-x:auto}
+  section[data-tab=excluded],section[data-tab=unknown],section[data-tab=timeline]{overflow-x:auto}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="pagehead">
+<h1>{{TITLE}}</h1>
+<div class="meta">{{META}}</div>
+</header>
+{{WARNINGS}}
+<nav class="tabs" role="tablist">{{GROUP_TABS}}</nav>
+<section data-tab="main">
+<div class="charts">{{CHARTS}}</div>
+<div class="filters">{{FILTERS}}</div>
+<div class="table-wrap">
+<table id="jobs">
+<thead><tr>{{THEAD}}</tr></thead>
+<tbody>{{TBODY}}</tbody>
+</table>
+</div>
+</section>
+<section data-tab="excluded" hidden>{{EXCLUDED}}</section>
+<section data-tab="unknown" hidden>{{UNKNOWN}}</section>
+{{TIMELINE}}
+<div class="foot">分数表示给定规则下的偏好匹配，不表示录取率、能力认证或招聘真实性。first/last seen 是本工具观察跨度，不是发布日期。</div>
+</div>
+<script>
+{{FILTER_JS}}
+</script>
+</body>
+</html>

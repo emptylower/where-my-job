@@ -1,0 +1,43 @@
+[project]
+name = "where-my-job"
+version = "0.1.0"
+description = "本地求职情报 CLI：导入/受控采集 BOSS 岗位，规则匹配，证据化报告，本地面板"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+  "jsonschema>=4.23,<5",
+  "websocket-client>=1.6,<2",
+  "psutil>=5.9,<8",
+  "pillow>=11,<13",
+  "segno>=1.6,<2",
+  "zxing-cpp>=3,<4",
+]
+
+[project.scripts]
+where-my-job = "where_my_job.cli.main:main"
+
+[dependency-groups]
+dev = [
+  "pytest>=8",
+  "pytest-timeout>=2.3",
+  "tomli>=2; python_version < '3.11'",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/where_my_job"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/src/where_my_job", "/SKILL.md", "/skill", "/README.md", "/LICENSE", "/NOTICE", "/pyproject.toml", "/uv.lock", "/scripts/release_check.py", "/tests/fixtures/synthetic"]
+exclude = ["tests/fixtures/private", "docs", ".omc", "**/__pycache__"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+timeout = 120
+markers = ["slow: 需要 uv build --offline 的慢测试", "perf: 规模测试，默认跳过"]
+addopts = "-q -m 'not perf'"

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "stream": "custom.interviews",
+  "stream_revision": 2,
+  "subject_kind": "application",
+  "types": {
+    "scheduled": {"required": ["round", "at"], "fields": {"round": "string", "at": "datetime", "format": "string", "interviewer_title": "string"}},
+    "done":      {"required": ["round"],       "fields": {"round": "string", "questions": "string", "self_rating": "integer"}},
+    "cancelled": {"required": ["round"],       "fields": {"round": "string", "reason": {"enum": ["company", "me", "other"]}}}
+  }
+}

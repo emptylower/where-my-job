@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: "IBM Plex Sans", "PingFang SC", "Noto Sans SC", system-ui, sans-serif; color: #1E2229; }
+    a { color: #1F6F78; } a:hover { color: #164F56; }
+    svg text { font-family: inherit; }
+    svg text.m { font-family: "IBM Plex Mono", "PingFang SC", Menlo, monospace; }
+  </style>
+</helmet>
+<div style="width: 1200px; height: 920px; box-sizing: border-box; background: #FFFFFF; padding: 32px 40px; display: flex; flex-direction: column; gap: 12px;">
+  <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #D5D8DD; padding-bottom: 10px;">
+    <div style="font-size: 20px; font-weight: 600;">S3 · 时序图：新建事件流、记录投递、纠错</div>
+    <div style="font-size: 12px; color: #6B7280;">设计 v3 §4.3：register 激活、首次 applied 建身份、corrected 替换/撤销</div>
+  </div>
+  <svg width="1120" height="800" viewBox="0 0 1120 800">
+    <defs>
+      <marker id="ar" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#2F3640"/></marker>
+      <marker id="ao" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10" fill="none" stroke="#2F3640" stroke-width="1.5"/></marker>
+    </defs>
+    <rect x="30" y="10" width="120" height="40" fill="#F1E8F4" stroke="#6B3F7A" stroke-width="1.5"/><text x="90" y="35" font-size="13" font-weight="600" text-anchor="middle">求职者</text>
+    <rect x="240" y="10" width="120" height="40" fill="#FBF1E1" stroke="#B8741A" stroke-width="1.5"/><text x="300" y="35" font-size="13" font-weight="600" text-anchor="middle">Agent</text>
+    <rect x="460" y="10" width="120" height="40" fill="#E4F0F1" stroke="#1F6F78" stroke-width="1.5"/><text x="520" y="35" font-size="13" font-weight="600" text-anchor="middle">CLI (service)</text>
+    <rect x="680" y="10" width="120" height="40" fill="#EEF0F3" stroke="#3C4858" stroke-width="1.5"/><text x="740" y="35" font-size="13" font-weight="600" text-anchor="middle">SQLite</text>
+    <rect x="900" y="10" width="140" height="40" fill="#EEF0F3" stroke="#3C4858" stroke-width="1.5"/><text x="970" y="35" font-size="13" font-weight="600" text-anchor="middle">~/.where-my-job/</text>
+    <line x1="90" y1="50" x2="90" y2="790" stroke="#9AA0A8" stroke-dasharray="4 4"/><line x1="300" y1="50" x2="300" y2="790" stroke="#9AA0A8" stroke-dasharray="4 4"/><line x1="520" y1="50" x2="520" y2="790" stroke="#9AA0A8" stroke-dasharray="4 4"/><line x1="740" y1="50" x2="740" y2="790" stroke="#9AA0A8" stroke-dasharray="4 4"/><line x1="970" y1="50" x2="970" y2="790" stroke="#9AA0A8" stroke-dasharray="4 4"/>
+
+    <rect x="60" y="66" width="1030" height="230" fill="none" stroke="#2F3640"/><rect x="60" y="66" width="40" height="16" fill="#2F3640"/><text x="80" y="78" font-size="10" fill="#fff" text-anchor="middle">alt</text><text x="106" y="78" font-size="10" fill="#3C4858">[新建本子：自定义流 custom.interviews 尚未注册]</text>
+    <line x1="90" y1="104" x2="298" y2="104" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="195" y="97" font-size="11" text-anchor="middle">1 "帮我记面试，按轮次"</text>
+    <line x1="300" y1="132" x2="518" y2="132" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="410" y="125" font-size="11" text-anchor="middle" class="m">2 stream list（确认无此流）</text>
+    <line x1="300" y1="160" x2="968" y2="160" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="634" y="153" font-size="11" text-anchor="middle">3 写候选 streams/interviews.json（stream_revision 1；类型 scheduled/done；subject=application）</text>
+    <line x1="300" y1="188" x2="518" y2="188" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="410" y="181" font-size="11" text-anchor="middle" class="m">4 validate stream F（只检查，不激活）</text>
+    <line x1="520" y1="216" x2="302" y2="216" stroke="#2F3640" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#ao)"/><text x="410" y="209" font-size="11" text-anchor="middle">ok（名称合法、类型限六种、无 projection、不重定义 corrected）</text>
+    <line x1="300" y1="244" x2="518" y2="244" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="410" y="237" font-size="11" text-anchor="middle" class="m">5 stream register --file F</text>
+    <line x1="520" y1="272" x2="738" y2="272" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="630" y="265" font-size="11" text-anchor="middle">tx：stream_registry 插入不可变版本+哈希；切换 is_active</text>
+    <line x1="520" y1="290" x2="302" y2="290" stroke="#2F3640" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#ao)"/><text x="410" y="284" font-size="10" text-anchor="middle">返回 stream、revision、hash（失败保留旧活动版本）</text>
+
+    <line x1="90" y1="326" x2="298" y2="326" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="195" y="319" font-size="11" text-anchor="middle">6 "今天投了 usmile"</text>
+    <line x1="300" y1="354" x2="518" y2="354" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="410" y="347" font-size="11" text-anchor="middle" class="m">7 event add --file F（applications/applied，job_id，幂等键）</text>
+    <line x1="520" y1="382" x2="738" y2="382" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="630" y="375" font-size="11" text-anchor="middle">tx：校验 job 存在 → 建 applications 身份 → 插 events（唯一创建特例）</text>
+    <line x1="520" y1="410" x2="302" y2="410" stroke="#2F3640" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#ao)"/><text x="410" y="403" font-size="11" text-anchor="middle">application_id、event_id（同键同内容重试返回原 ID）</text>
+
+    <line x1="90" y1="444" x2="298" y2="444" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="195" y="437" font-size="11" text-anchor="middle">8 "周四一面，视频"</text>
+    <line x1="300" y1="472" x2="518" y2="472" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="410" y="465" font-size="11" text-anchor="middle" class="m">9 event add（custom.interviews/scheduled，subject=application_id，rev 1）</text>
+    <line x1="520" y1="500" x2="738" y2="500" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="630" y="493" font-size="11" text-anchor="middle">校验流活动版本、类型已声明、必填齐全、subject 存在且有有效 applied</text>
+
+    <rect x="60" y="520" width="1030" height="150" fill="none" stroke="#2F3640"/><rect x="60" y="520" width="40" height="16" fill="#2F3640"/><text x="80" y="532" font-size="10" fill="#fff" text-anchor="middle">alt</text><text x="106" y="532" font-size="10" fill="#3C4858">[纠错：日期记错了]</text>
+    <line x1="90" y1="560" x2="298" y2="560" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="195" y="553" font-size="11" text-anchor="middle">10 "不对，是周五"</text>
+    <line x1="300" y1="588" x2="518" y2="588" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="410" y="581" font-size="11" text-anchor="middle" class="m">11 event list --stream custom.interviews --subject A（取链末端 ID）</text>
+    <line x1="300" y1="616" x2="518" y2="616" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="410" y="609" font-size="11" text-anchor="middle" class="m">12 event add（type=corrected，op=replace，目标=末端，完整替代 payload）</text>
+    <line x1="520" y1="644" x2="738" y2="644" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="630" y="637" font-size="11" text-anchor="middle">tx：同流同主体、目标是末端、单后继；写控制事件；不改历史行</text>
+    <line x1="520" y1="662" x2="302" y2="662" stroke="#2F3640" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#ao)"/><text x="410" y="657" font-size="10" text-anchor="middle">根事件 ID + 当前版本事件 ID</text>
+
+    <line x1="300" y1="700" x2="518" y2="700" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="410" y="693" font-size="11" text-anchor="middle" class="m">13 panel --open（注册流时间线 tab；v_events 有效事实）</text>
+    <line x1="520" y1="728" x2="738" y2="728" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="630" y="721" font-size="11" text-anchor="middle">读 v_jobs（application_state、followup_due）+ v_events</text>
+    <line x1="300" y1="760" x2="92" y2="760" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="195" y="753" font-size="11" text-anchor="middle">14 "已记录；72 小时未回复会提醒跟进"</text>
+    <text x="30" y="790" font-size="10" fill="#6B7280">v1 不生成每流 SQL 视图、不做 latest_by 合并：scheduled 与 done 各自成行。撤销（retract）不删历史行；撤销仍有依赖事件的 applied 会被拒绝。</text>
+  </svg>
+</div>
+</x-dc>
+</body>
+</html>

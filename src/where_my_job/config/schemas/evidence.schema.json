@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind", "captured_at", "excerpt", "idempotency_key"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "job_id": {"type": "string", "pattern": "^boss:[A-Za-z0-9~_-]{1,128}$"},
+    "company_id": {"type": "string", "pattern": "^boss:[A-Za-z0-9~_-]{1,128}$"},
+    "kind": {"enum": ["web_page", "document", "user_statement"]},
+    "origin": {"enum": ["agent", "user"]},
+    "url": {"type": "string", "pattern": "^https://[^\\s]+$", "maxLength": 2048},
+    "captured_at": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$"},
+    "published_at": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$"},
+    "excerpt": {"type": "string", "minLength": 1, "maxLength": 262144},
+    "full_text": {"type": "string", "maxLength": 262144},
+    "structured": {"type": "object"},
+    "source_note": {"type": "string", "maxLength": 1024},
+    "idempotency_key": {"type": "string", "minLength": 8, "maxLength": 200}
+  },
+  "anyOf": [{"required": ["job_id"]}, {"required": ["company_id"]}]
+}

@@ -1,0 +1,182 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: "IBM Plex Sans", "PingFang SC", "Noto Sans SC", system-ui, sans-serif; color: #1E2229; }
+    a { color: #1F6F78; } a:hover { color: #164F56; }
+    svg text { font-family: inherit; }
+    svg text.m { font-family: "IBM Plex Mono", "PingFang SC", Menlo, monospace; }
+  </style>
+</helmet>
+<div style="width: 1200px; height: 1020px; box-sizing: border-box; background: #FFFFFF; padding: 32px 40px; display: flex; flex-direction: column; gap: 12px;">
+  <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #D5D8DD; padding-bottom: 10px;">
+    <div style="font-size: 20px; font-weight: 600;">D1 · 实体关系图（SQLite · 15 表 + 固定视图）</div>
+    <div style="font-size: 12px; color: #6B7280;">设计 v3 §4.1–§4.3 · PK 下划线 · FK 斜体 · 只列关键列</div>
+  </div>
+  <svg width="1120" height="890" viewBox="0 0 1120 890">
+    <defs>
+      <marker id="ar" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#2F3640"/></marker>
+    </defs>
+
+    <!-- row 1: facts -->
+    <rect x="20" y="20" width="250" height="120" rx="2" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.5"/><rect x="20" y="20" width="250" height="24" fill="#E4F0F1" stroke="#1F6F78" stroke-width="1.5"/>
+    <text x="145" y="37" font-size="13" font-weight="600" text-anchor="middle">runs</text>
+    <text x="30" y="62" font-size="11" class="m" text-decoration="underline">run_id</text>
+    <text x="30" y="78" font-size="11" class="m">kind import|scan|deepdive|match</text>
+    <text x="30" y="94" font-size="11" class="m">config_hash  parent_run_id</text>
+    <text x="30" y="110" font-size="11" class="m">planned INT  completed INT</text>
+    <text x="30" y="126" font-size="11" class="m">status ok|blocked|partial|failed|cancelled</text>
+
+    <rect x="300" y="20" width="250" height="120" rx="2" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.5"/><rect x="300" y="20" width="250" height="24" fill="#E4F0F1" stroke="#1F6F78" stroke-width="1.5"/>
+    <text x="425" y="37" font-size="13" font-weight="600" text-anchor="middle">run_tasks</text>
+    <text x="310" y="62" font-size="11" class="m" text-decoration="underline">task_id</text>
+    <text x="310" y="78" font-size="11" class="m" font-style="italic">run_id  UNIQUE(run_id, task_key)</text>
+    <text x="310" y="94" font-size="11" class="m">keyword city page | action</text>
+    <text x="310" y="110" font-size="11" class="m">status  fail_reason</text>
+    <text x="310" y="126" font-size="11" class="m">response_key</text>
+
+    <rect x="580" y="20" width="250" height="120" rx="2" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.5"/><rect x="580" y="20" width="250" height="24" fill="#E4F0F1" stroke="#1F6F78" stroke-width="1.5"/>
+    <text x="705" y="37" font-size="13" font-weight="600" text-anchor="middle">sightings</text>
+    <text x="590" y="62" font-size="11" class="m" text-decoration="underline">observation_id</text>
+    <text x="590" y="78" font-size="11" class="m" font-style="italic">job_id  task_id</text>
+    <text x="590" y="94" font-size="11" class="m">UNIQUE(task_id,response_key,item_index)</text>
+    <text x="590" y="110" font-size="11" class="m">observed_at  time_precision  raw_kind</text>
+    <text x="590" y="126" font-size="11" class="m">raw_entry_json  content_hash</text>
+
+    <rect x="860" y="20" width="250" height="120" rx="2" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.5"/><rect x="860" y="20" width="250" height="24" fill="#E4F0F1" stroke="#1F6F78" stroke-width="1.5"/>
+    <text x="985" y="37" font-size="13" font-weight="600" text-anchor="middle">jobs</text>
+    <text x="870" y="62" font-size="11" class="m" text-decoration="underline">job_id  boss:&lt;encryptJobId&gt;</text>
+    <text x="870" y="78" font-size="11" class="m">UNIQUE(source, source_job_id)</text>
+    <text x="870" y="94" font-size="11" class="m" font-style="italic">company_id → companies</text>
+    <text x="870" y="110" font-size="11" class="m">legacy_job_id  title  salary_*</text>
+    <text x="870" y="126" font-size="11" class="m">first/last_seen_at  seen_run_count</text>
+
+    <!-- row 2 -->
+    <rect x="20" y="180" width="250" height="100" rx="2" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.5"/><rect x="20" y="180" width="250" height="24" fill="#E4F0F1" stroke="#1F6F78" stroke-width="1.5"/>
+    <text x="145" y="197" font-size="13" font-weight="600" text-anchor="middle">companies</text>
+    <text x="30" y="222" font-size="11" class="m" text-decoration="underline">company_id</text>
+    <text x="30" y="238" font-size="11" class="m">UNIQUE(source, source_company_id)</text>
+    <text x="30" y="254" font-size="11" class="m">name  detail_evidence_id NULL</text>
+    <text x="30" y="270" font-size="10" fill="#6B7280">占位由 scan/import 建；deepdive 补</text>
+
+    <rect x="300" y="180" width="250" height="100" rx="2" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.5"/><rect x="300" y="180" width="250" height="24" fill="#E4F0F1" stroke="#1F6F78" stroke-width="1.5"/>
+    <text x="425" y="197" font-size="13" font-weight="600" text-anchor="middle">evidence</text>
+    <text x="310" y="222" font-size="11" class="m" text-decoration="underline">evidence_id  UNIQUE(idem_key)</text>
+    <text x="310" y="238" font-size="11" class="m" font-style="italic">job_id | company_id</text>
+    <text x="310" y="254" font-size="11" class="m">origin cli|agent|user  kind  url</text>
+    <text x="310" y="270" font-size="11" class="m">captured_at published_at hash completeness</text>
+
+    <rect x="580" y="180" width="250" height="100" rx="2" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.5"/><rect x="580" y="180" width="250" height="24" fill="#E4F0F1" stroke="#1F6F78" stroke-width="1.5"/>
+    <text x="705" y="197" font-size="13" font-weight="600" text-anchor="middle">evidence_bundles</text>
+    <text x="590" y="222" font-size="11" class="m" text-decoration="underline">bundle_id</text>
+    <text x="590" y="238" font-size="11" class="m" font-style="italic">job_id</text>
+    <text x="590" y="254" font-size="11" class="m">evidence_ids_json（不可变清单）</text>
+    <text x="590" y="270" font-size="11" class="m">acquisition_state complete|partial</text>
+
+    <rect x="860" y="180" width="250" height="100" rx="2" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.5"/><rect x="860" y="180" width="250" height="24" fill="#E4F0F1" stroke="#1F6F78" stroke-width="1.5"/>
+    <text x="985" y="197" font-size="13" font-weight="600" text-anchor="middle">deepdives</text>
+    <text x="870" y="222" font-size="11" class="m" text-decoration="underline">report_id  UNIQUE(idem_key)</text>
+    <text x="870" y="238" font-size="11" class="m" font-style="italic">job_id  bundle_id</text>
+    <text x="870" y="254" font-size="11" class="m">report_md NOT NULL  conclusion enum</text>
+    <text x="870" y="270" font-size="11" class="m">signals_for/against_json  refs_json</text>
+
+    <!-- row 3 -->
+    <rect x="20" y="320" width="250" height="100" rx="2" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.5"/><rect x="20" y="320" width="250" height="24" fill="#E4F0F1" stroke="#1F6F78" stroke-width="1.5"/>
+    <text x="145" y="337" font-size="13" font-weight="600" text-anchor="middle">match_results</text>
+    <text x="30" y="362" font-size="11" class="m" text-decoration="underline">(match_run_id, job_id)</text>
+    <text x="30" y="378" font-size="11" class="m">input_hash  dir  rule_score  tier</text>
+    <text x="30" y="394" font-size="11" class="m">reasons_json  excluded  exclusion_json</text>
+    <text x="30" y="410" font-size="11" class="m">unknowns_json</text>
+
+    <rect x="300" y="320" width="250" height="100" rx="2" fill="#FFFFFF" stroke="#B8741A" stroke-width="1.5"/><rect x="300" y="320" width="250" height="24" fill="#FBF1E1" stroke="#B8741A" stroke-width="1.5"/>
+    <text x="425" y="337" font-size="13" font-weight="600" text-anchor="middle">job_attrs</text>
+    <text x="310" y="362" font-size="11" class="m" text-decoration="underline">(job_id, key, source)</text>
+    <text x="310" y="378" font-size="11" class="m">source agent|user（无 rule）</text>
+    <text x="310" y="394" font-size="11" class="m">value_json  based_on_revision</text>
+    <text x="310" y="410" font-size="10" fill="#6B7280">priority · note · score_adjustment · custom.*</text>
+
+    <rect x="580" y="320" width="250" height="100" rx="2" fill="#FFFFFF" stroke="#3C4858" stroke-width="1.5"/><rect x="580" y="320" width="250" height="24" fill="#EEF0F3" stroke="#3C4858" stroke-width="1.5"/>
+    <text x="705" y="337" font-size="13" font-weight="600" text-anchor="middle">network_policy_state</text>
+    <text x="590" y="362" font-size="11" class="m" text-decoration="underline">browser_profile_id</text>
+    <text x="590" y="378" font-size="11" class="m">cooldown_until  last_action_at</text>
+    <text x="590" y="394" font-size="11" class="m">action_ledger_json（滚动 24h）</text>
+    <text x="590" y="410" font-size="10" fill="#6B7280">不由 agent 配置或数据清理重置</text>
+
+    <rect x="860" y="320" width="250" height="100" rx="2" fill="#FFFFFF" stroke="#3C4858" stroke-width="1.5"/><rect x="860" y="320" width="250" height="24" fill="#EEF0F3" stroke="#3C4858" stroke-width="1.5"/>
+    <text x="985" y="337" font-size="13" font-weight="600" text-anchor="middle">schema_migrations</text>
+    <text x="870" y="362" font-size="11" class="m" text-decoration="underline">version</text>
+    <text x="870" y="378" font-size="11" class="m">checksum  applied_at</text>
+    <text x="870" y="404" font-size="10" fill="#6B7280">核心表由迁移文件版本化；无用户 DDL</text>
+
+    <!-- row 4: events -->
+    <rect x="20" y="460" width="250" height="100" rx="2" fill="#FFFFFF" stroke="#6B3F7A" stroke-width="1.5"/><rect x="20" y="460" width="250" height="24" fill="#F1E8F4" stroke="#6B3F7A" stroke-width="1.5"/>
+    <text x="145" y="477" font-size="13" font-weight="600" text-anchor="middle">applications</text>
+    <text x="30" y="502" font-size="11" class="m" text-decoration="underline">application_id</text>
+    <text x="30" y="518" font-size="11" class="m" font-style="italic">job_id → jobs（索引）</text>
+    <text x="30" y="534" font-size="11" class="m">created_at</text>
+    <text x="30" y="550" font-size="10" fill="#6B7280">首次 applied 同事务创建；不存事件副本</text>
+
+    <rect x="300" y="460" width="250" height="100" rx="2" fill="#FFFFFF" stroke="#6B3F7A" stroke-width="1.5"/><rect x="300" y="460" width="250" height="24" fill="#F1E8F4" stroke="#6B3F7A" stroke-width="1.5"/>
+    <text x="425" y="477" font-size="13" font-weight="600" text-anchor="middle">stream_registry</text>
+    <text x="310" y="502" font-size="11" class="m" text-decoration="underline">(stream, stream_revision)</text>
+    <text x="310" y="518" font-size="11" class="m">definition_json  content_hash</text>
+    <text x="310" y="534" font-size="11" class="m">registered_at  is_active</text>
+    <text x="310" y="550" font-size="10" fill="#6B7280">不可变；只由 stream register 写</text>
+
+    <rect x="580" y="460" width="530" height="130" rx="2" fill="#FFFFFF" stroke="#6B3F7A" stroke-width="1.5"/><rect x="580" y="460" width="530" height="24" fill="#F1E8F4" stroke="#6B3F7A" stroke-width="1.5"/>
+    <text x="845" y="477" font-size="13" font-weight="600" text-anchor="middle">events（全部业务与纠错事件的唯一存储）</text>
+    <text x="590" y="502" font-size="11" class="m" text-decoration="underline">event_id</text>
+    <text x="590" y="518" font-size="11" class="m" font-style="italic">(stream, stream_revision) → stream_registry</text>
+    <text x="590" y="534" font-size="11" class="m">type 业务类型 | corrected（保留控制类型，op replace|retract）</text>
+    <text x="590" y="550" font-size="11" class="m">subject_kind job|company|application|none  subject_id</text>
+    <text x="590" y="566" font-size="11" class="m">occurred_at  recorded_at  payload_json  origin agent|user</text>
+    <text x="590" y="582" font-size="11" class="m">idempotency_key UNIQUE  corrected_event_id → events（链末端，单后继）</text>
+
+    <!-- views -->
+    <rect x="20" y="630" width="530" height="120" rx="2" fill="#F7F8FA" stroke="#3C4858" stroke-width="1.5" stroke-dasharray="3 3"/>
+    <text x="285" y="652" font-size="13" font-weight="600" text-anchor="middle">v_jobs（固定列投影，schema v1）</text>
+    <text x="30" y="674" font-size="11" fill="#3C4858">jobs ⋈ 最新事实 ⋈ 选定 match_run ⋈ 有效 user/agent 标注 ⋈ 当前 bundle/report ⋈ 关注的投递</text>
+    <text x="30" y="690" font-size="11" class="m" fill="#3C4858">job_id title company_* city salary_lo/hi(REAL) exp degree skills_json fact_revision</text>
+    <text x="30" y="706" font-size="11" class="m" fill="#3C4858">first/last_seen_at seen_run_count hit_count match_state rule_score score_adjustment score tier</text>
+    <text x="30" y="722" font-size="11" class="m" fill="#3C4858">reasons_json excluded priority current_bundle_id report_id report_state application_state followup_due</text>
+    <text x="30" y="740" font-size="10" fill="#6B7280">列集合不随自由 key 变化；数值拒绝字符串；未知不 CAST 为 0；as_of 固定于查询开始</text>
+
+    <rect x="580" y="630" width="530" height="120" rx="2" fill="#F7F8FA" stroke="#3C4858" stroke-width="1.5" stroke-dasharray="3 3"/>
+    <text x="845" y="652" font-size="13" font-weight="600" text-anchor="middle">v_events（通用时间线）· v_evidence · v_runs</text>
+    <text x="590" y="674" font-size="11" fill="#3C4858">events 解析纠错链后的有效事实：流、类型、发生时间、根/当前事件 ID、声明版本、受控 payload</text>
+    <text x="590" y="690" font-size="11" fill="#3C4858">v1 不按流生成视图，不做 latest_by 合并；scheduled 与 done 各自成行</text>
+    <text x="590" y="706" font-size="11" fill="#3C4858">v_evidence：受限字段与摘录，无 raw；v_runs：run/task 完成统计</text>
+    <text x="590" y="740" font-size="10" fill="#6B7280">raw、导航关联字段（security_id/lid）、私有画像不出现在任何视图</text>
+
+    <!-- relations -->
+    <line x1="270" y1="70" x2="298" y2="70" stroke="#2F3640" stroke-width="1.5"/><text x="276" y="64" font-size="10">1</text><text x="288" y="64" font-size="10">N</text>
+    <line x1="550" y1="70" x2="578" y2="70" stroke="#2F3640" stroke-width="1.5"/><text x="556" y="64" font-size="10">1</text><text x="568" y="64" font-size="10">N</text>
+    <line x1="830" y1="70" x2="858" y2="70" stroke="#2F3640" stroke-width="1.5"/><text x="836" y="64" font-size="10">N</text><text x="848" y="64" font-size="10">1</text>
+    <path d="M985 140 L985 160 L145 160 L145 178" fill="none" stroke="#2F3640" stroke-width="1.5"/><text x="991" y="156" font-size="10">N</text><text x="151" y="176" font-size="10">1</text>
+    <path d="M1000 140 L1000 168 L425 168 L425 178" fill="none" stroke="#2F3640" stroke-width="1.5"/><text x="431" y="176" font-size="10">N</text>
+    <line x1="550" y1="230" x2="578" y2="230" stroke="#2F3640" stroke-width="1.5"/><text x="556" y="224" font-size="10">N</text><text x="568" y="224" font-size="10">1</text>
+    <line x1="830" y1="230" x2="858" y2="230" stroke="#2F3640" stroke-width="1.5"/><text x="836" y="224" font-size="10">1</text><text x="848" y="224" font-size="10">N</text>
+    <path d="M1015 140 L1015 300 L145 300 L145 318" fill="none" stroke="#2F3640" stroke-width="1.5"/><text x="151" y="316" font-size="10">N</text>
+    <path d="M1030 140 L1030 308 L425 308 L425 318" fill="none" stroke="#2F3640" stroke-width="1.5"/><text x="431" y="316" font-size="10">N</text>
+    <path d="M1045 140 L1045 440 L145 440 L145 458" fill="none" stroke="#2F3640" stroke-width="1.5"/><text x="151" y="456" font-size="10">N</text>
+    <line x1="550" y1="510" x2="578" y2="510" stroke="#2F3640" stroke-width="1.5"/><text x="556" y="504" font-size="10">1</text><text x="568" y="504" font-size="10">N</text>
+    <path d="M270 520 L285 520 L285 600 L700 600 L700 590" fill="none" stroke="#2F3640" stroke-width="1.5"/><text x="706" y="600" font-size="10">N（subject）</text>
+
+    <text x="20" y="790" font-size="12" font-weight="600">约束与迁移</text>
+    <text x="20" y="808" font-size="11" fill="#3C4858">· 所有连接开启 FK；时间存 UTC ISO 8601，展示转用户时区；不删除岗位（下线只反映为 last_seen_at 停止更新）。</text>
+    <text x="20" y="824" font-size="11" fill="#3C4858">· 旧 42 文件 → 1 个 import run：1260 sightings（raw_kind=legacy_mapped，UNIQUE(file_sha256,item_index)）、1225 jobs；final_jobs 的 _dir 作对照，分数不导入，由 legacy 规则私有重算。</text>
+    <text x="20" y="840" font-size="11" fill="#3C4858">· 索引：sightings(job_id,observed_at) sightings(run_id) run_tasks(run_id,status) jobs(company_id) evidence(job_id,captured_at) deepdives(job_id,created_at)</text>
+    <text x="20" y="856" font-size="11" fill="#3C4858">  match_results(match_run_id,score) events(stream,subject_kind,subject_id,occurred_at) applications(job_id)。</text>
+    <text x="20" y="876" font-size="11" fill="#6B7280">v1.1：每流 SQL 视图与 latest_by；自由 SQL 的对象授权与可打断执行器；可选留存自动清理。</text>
+  </svg>
+</div>
+</x-dc>
+</body>
+</html>

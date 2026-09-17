@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: "IBM Plex Sans", "PingFang SC", "Noto Sans SC", system-ui, sans-serif; color: #1E2229; }
+    a { color: #1F6F78; } a:hover { color: #164F56; }
+    .mono { font-family: "IBM Plex Mono", "PingFang SC", Menlo, monospace; }
+    td, th { padding: 5px 8px; border: 1px solid #D5D8DD; vertical-align: top; }
+    th { background: #F0F2F5; text-align: left; font-weight: 600; }
+  </style>
+</helmet>
+<div style="width: 1200px; height: 1180px; box-sizing: border-box; background: #FFFFFF; padding: 32px 40px; display: flex; flex-direction: column; gap: 12px;">
+  <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #D5D8DD; padding-bottom: 10px;">
+    <div style="font-size: 20px; font-weight: 600;">C4 · 代码模块结构与职责矩阵</div>
+    <div style="font-size: 12px; color: #6B7280;">设计 v3 §3、§9、§11</div>
+  </div>
+  <div style="display: grid; grid-template-columns: 420px minmax(0, 1fr); gap: 24px; flex-grow: 1;">
+    <pre class="mono" style="margin: 0; font-size: 11.5px; line-height: 1.5; background: #F7F8FA; border: 1px solid #D5D8DD; border-radius: 4px; padding: 12px 14px; overflow: hidden;">where-my-job/
+├── SKILL.md                     # 根目录入口
+├── skill/
+│   ├── references/
+│   │   ├── interview.md         # 最小访谈；先告知处理边界
+│   │   ├── privacy-boundary.md
+│   │   ├── profile-schema.md
+│   │   ├── strategy-schema.md
+│   │   ├── scoring-schema.md
+│   │   ├── panel-schema.md
+│   │   ├── evidence-report-schema.md
+│   │   ├── event-schema.md
+│   │   ├── stream-schema.md
+│   │   ├── report-template.md
+│   │   └── research-checklist.md
+│   └── examples/                # 全部合成
+│       ├── profile.synthetic-qc-to-aipm.json
+│       ├── strategy.first-page.json
+│       ├── scoring.minimal-aipm.json
+│       ├── panel.default.json
+│       ├── stream.synthetic-interviews.json
+│       └── report.synthetic.json
+├── src/where_my_job/
+│   ├── __main__.py  errors.py  paths.py  clock.py  ids.py  redact.py
+│   ├── cli/          # 参数解析、JSON envelope
+│   ├── config/       # 配置读写与 schema
+│   ├── service/      # 事务编排
+│   ├── policy/       # 网络门禁、锁、预算、冷却
+│   ├── adapter/      # 响应捕获、typed 结果
+│   ├── launcher/     # 受限 Chrome 启动/停止
+│   ├── normalize/    # 纯函数
+│   ├── rules/        # 条件树、计分、AST
+│   ├── validate/     # schemas/*.schema.json
+│   ├── store/        # migrations/ views/ queries/
+│   ├── panel/        # 模板、转义、固定筛选脚本
+│   ├── streams/      # 事件流注册与有效事件
+│   ├── importer/     # 历史 JSON 导入
+│   └── vendor/boss_zhipin_scraper/   # 最小原语 primitives.py
+│       └── LICENSE  NOTICE  UPSTREAM.md（commit/hash）
+├── tests/
+│   ├── fixtures/synthetic/      # 响应、页面、JD、恶意样本
+│   ├── unit/ integration/       # 分层用例
+│   ├── security/                # 注入与越权样本
+│   ├── manual/                  # 在线核查清单（人工执行）
+│   └── regression/              # 读用户私有 manifest；不在 CI
+├── pyproject.toml  uv.lock  README.md</pre>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <table style="border-collapse: collapse; width: 100%; font-size: 11.5px;">
+        <thead><tr><th style="width: 84px;">模块</th><th>单一职责</th><th style="width: 150px;">可依赖</th><th style="width: 170px;">测试方式</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">cli</td><td>参数解析、子命令分发、envelope、退出码</td><td>service</td><td>子进程 + envelope schema</td></tr>
+          <tr><td class="mono">service</td><td>事务编排：scan/deepdive/match/report set/event add/stream register；把事实快照交给纯函数</td><td>policy adapter launcher normalize rules validate panel importer store</td><td>临时库 + mock adapter</td></tr>
+          <tr><td class="mono">policy</td><td>网络门禁：canonical profile 文件锁、预占动作、滚动预算、冷却、逐响应风控判定</td><td>store config</td><td>注入时钟/随机源；第二页 31/37 无第三次导航</td></tr>
+          <tr><td class="mono">adapter</td><td>关联本次 tab 的目标响应；typed success/empty/blocked/unauth/unknown；映射前保存条目</td><td>vendor</td><td>合成响应/页面 fixtures</td></tr>
+          <tr><td class="mono">launcher</td><td>受限参数启动专用 Chrome；校验回环与归属；stop</td><td>config</td><td>参数快照 + 监听校验负例</td></tr>
+          <tr><td class="mono">normalize</td><td>纯函数：条目 → 标准事实；薪资单位/币种/薪数；枚举；未知为 NULL</td><td>无</td><td>表驱动单测</td></tr>
+          <tr><td class="mono">rules</td><td>纯函数：条件树、first-match、计分组封顶、unknown 传播；受限 worker 超时</td><td>无</td><td>legacy 私有回归 402 / 478；边界用例</td></tr>
+          <tr><td class="mono">validate</td><td>纯函数：JSON Schema + 语义（预算上限、升版兼容、引用存在于给定快照）</td><td>无</td><td>正反样例</td></tr>
+          <tr><td class="mono">store</td><td>唯一数据库访问层：迁移、固定视图、预定义参数化查询、事务</td><td>config</td><td>迁移幂等；FK；并发写</td></tr>
+          <tr><td class="mono">panel</td><td>固定视图 → 单文件 HTML；上下文转义；固定可信筛选脚本；无外部资源</td><td>store validate</td><td>快照 + 恶意内容 + 无外链</td></tr>
+          <tr><td class="mono">importer</td><td>历史 JSON → import run；legacy_mapped；(file_sha256,item_index) 幂等</td><td>store normalize</td><td>1260/1225；重导不增</td></tr>
+          <tr><td class="mono">vendor</td><td>上游最小原语（CDP 会话、捕获）；固定版本、不修改</td><td>websocket-client requests</td><td>上游测试 + 合成</td></tr>
+        </tbody>
+      </table>
+      <div style="display: flex; flex-direction: column; gap: 5px; font-size: 11.5px; color: #3C4858; border-left: 3px solid #1F6F78; padding: 8px 12px; background: #F7F8FA;">
+        <div><span style="font-weight: 600; color: #1E2229;">依赖方向</span>：cli → service → {policy, adapter, launcher, normalize, rules, validate, panel, importer} → {store, vendor} → config。import-linter 断言，禁止反向。</div>
+        <div><span style="font-weight: 600; color: #1E2229;">数据库</span>：只有 store 可 import sqlite3；其他模块只拿 store 暴露的函数。</div>
+        <div><span style="font-weight: 600; color: #1E2229;">LLM</span>：任何模块不得 import LLM SDK；pyproject 无相关依赖。</div>
+        <div><span style="font-weight: 600; color: #1E2229;">可注入</span>：时间、随机源、网络适配、文件路径均可注入；rules/normalize/validate 不访问网络与数据库。</div>
+        <div><span style="font-weight: 600; color: #1E2229;">发行</span>：源码包按 allowlist 打包；发布前扫描真实导航关联值、真实标识、个人信息；真实回归只走私有 manifest。</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

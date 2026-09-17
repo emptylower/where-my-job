@@ -1,0 +1,4 @@
+{"schema_version": 1, "stream": "custom.interviews", "stream_revision": 1, "type": "scheduled", "subject_kind": "application",
+ "subject_id": "APP_ID_PLACEHOLDER", "occurred_at": "2026-09-11T11:00:00+08:00",
+ "payload": {"round": "1", "at": "2026-09-15T10:00:00+08:00", "format": "video"},
+ "idempotency_key": "syn-sched-0001", "origin": "agent"}

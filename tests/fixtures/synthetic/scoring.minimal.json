@@ -1,0 +1,46 @@
+{
+  "schema_version": 2,
+  "profile_revision": "synthetic-qc-to-aipm-v1",
+  "campus_policy": "auto",
+  "classify": [
+    {"dir": "AI产品经理",
+     "when": {"all": [{"field": "title", "match": "产品经理"},
+                      {"field": "title_skills", "match": "AI|人工智能|大模型|Agent", "flags": "i"}]}},
+    {"dir": null,
+     "when": {"field": "title", "match": "实习"}},
+    {"dir": "AI全栈",
+     "when": {"all": [{"field": "title_skills", "match": "全栈|Full[- ]?Stack", "flags": "i"},
+                      {"field": "title_skills", "match": "AI|LLM|大模型", "flags": "i"}]}}
+  ],
+  "exclude": [
+    {"id": "degree-limit", "when": {"field": "degree", "in": ["硕士", "博士"]}, "reason": "当前画像未提供该学历资格，需按明确要求核实"},
+    {"id": "experience-limit", "when": {"field": "exp", "in": ["3-5年", "5-10年", "10年以上"]}, "reason": "超出本次选择的经验范围"}
+  ],
+  "score": {
+    "AI产品经理": {
+      "base": 60, "base_reason": "本次优先探索方向",
+      "rules": [
+        {"id": "agent-interest", "when": {"field": "title_skills", "match": "Agent|智能体", "flags": "i"}, "add": 12,
+         "reason": "出现与用户主题偏好相关的 Agent 标签，实际职责待 JD 核验"},
+        {"id": "b-side", "when": {"field": "title_skills", "match": "B端|中后台"}, "add": 8, "reason": "B端/中后台偏好", "group": "domain"},
+        {"id": "c-side", "when": {"field": "title_skills", "match": "C端"}, "add": 2, "reason": "C端标签偏好", "group": "domain"}
+      ],
+      "groups": {"domain": {"min": 0, "max": 8}}
+    },
+    "AI全栈": {
+      "base": 45, "base_reason": "全栈方向偏好；是否考手写代码待核验",
+      "rules": [
+        {"id": "high-pay-risk", "when": {"field": "salary_hi", "gte": 45}, "add": -10, "reason": "高薪岗准备成本偏好；编码要求待 JD 核验"},
+        {"id": "stack-match", "skills_hit": {"field": "title_skills_industry", "per_category": 1, "cap": 6,
+           "categories": {"React": "React", "Vue": "Vue", "TS": "TypeScript", "Node": "Node", "Python": "Python",
+                          "Go": "Golang", "Redis": "Redis", "MySQL": "MySQL", "MongoDB": "MongoDB"}},
+         "reason": "技术栈标签匹配，去重类别计分"}
+      ]
+    }
+  },
+  "global": [
+    {"id": "preferred-city", "when": {"field": "city", "eq": "合肥"}, "add": 3, "reason": "符合本次城市偏好"}
+  ],
+  "tiers": {"S": 90, "A": 75, "B": 60, "C": 40},
+  "fallback_tier": "D"
+}

@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "job_id": "boss:SYN0001aaaa",
+  "bundle_id": "bundle_SYN0001",
+  "extra_evidence_ids": [],
+  "profile_revision": "synthetic-qc-to-aipm-v1",
+  "idempotency_key": "report-synthetic-0001",
+  "authentic": {
+    "facts": [
+      {
+        "evidence_id": "ev_SYN0001detail",
+        "claim": "合成 JD 提及 Agent 工具。"
+      }
+    ],
+    "supporting": [],
+    "opposing": [],
+    "unknowns": [
+      "未取得可判断当前招聘意向或长期展示的线索；合成 JD 不代表真实招聘。"
+    ],
+    "conclusion": "证据不足",
+    "conclusion_label": "推断"
+  },
+  "jd_translation": {
+    "sentences": [
+      {
+        "original": "熟悉 Agent 工作流",
+        "explanation": "需要理解工具之间的任务衔接。",
+        "assumption": "是否要求编写代码尚未说明。",
+        "evidence_id": "ev_SYN0001detail"
+      }
+    ]
+  },
+  "mismatches": [
+    {
+      "requirement": "岗位具体产品经验要求待核验",
+      "profile": "画像只提供了 QC 流程经历",
+      "severity": "unknown",
+      "assumption": "尚未取得可确认经验门槛的 JD 原句。"
+    }
+  ],
+  "resume_advice": {
+    "proven": [
+      "按画像自述说明 QC 工作中的需求拆解和验收职责。"
+    ],
+    "to_reach": [
+      "补充可演示的 AI 工具项目并记录验证过程。"
+    ]
+  },
+  "report_md": "# 合成岗位报告\n\n## 招聘信号判断\n事实：合成 JD 提及 Agent 工具（ev_SYN0001detail）。\n支持信号：未取得。反对信号：未取得。\n未知：当前招聘意向及展示持续性均未核验。定性倾向：证据不足（推断）。\n没有连续采样，不能从离散观察推断持续展示或持续招聘。\n\n## JD 翻译\n熟悉 Agent 工作流：需要理解工具间任务衔接（ev_SYN0001detail）；是否要求编写代码未知。\n\n## 不匹配点\n产品经验门槛未知；画像只提供 QC 经历，不推断已满足产品岗位要求。\n\n## 简历建议\n已证实经历如何表达：按画像自述说明需求拆解与验收职责。\n要达标还需补的行动：制作可演示项目并记录验证过程，不写成已有经历。\n"
+}

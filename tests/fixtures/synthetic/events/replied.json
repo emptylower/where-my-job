@@ -1,0 +1,3 @@
+{"schema_version": 1, "stream": "applications", "stream_revision": 1, "type": "replied", "subject_kind": "application",
+ "subject_id": "APP_ID_PLACEHOLDER", "occurred_at": "2026-09-11T10:00:00+08:00", "payload": {"note": "HR 约面"},
+ "idempotency_key": "syn-replied-0001", "origin": "user"}

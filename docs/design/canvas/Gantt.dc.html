@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: "IBM Plex Sans", "PingFang SC", "Noto Sans SC", system-ui, sans-serif; color: #1E2229; }
+    a { color: #1F6F78; } a:hover { color: #164F56; }
+    .mono { font-family: "IBM Plex Mono", "PingFang SC", Menlo, monospace; }
+    .r { padding: 5px 8px; border-right: 1px solid #D5D8DD; border-bottom: 1px solid #E4E7EB; }
+    .c { border-bottom: 1px solid #E4E7EB; }
+    .b { height: 14px; border-radius: 2px; margin: 4px 2px; }
+  </style>
+</helmet>
+<div style="width: 1200px; height: 860px; box-sizing: border-box; background: #FFFFFF; padding: 32px 40px; display: flex; flex-direction: column; gap: 12px;">
+  <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #D5D8DD; padding-bottom: 10px;">
+    <div style="font-size: 20px; font-weight: 600;">P1 · 甘特图：v1 beta 四周排期（目标，非承诺）</div>
+    <div style="font-size: 12px; color: #6B7280;">设计 v3 §10；1 名维护者 + coding agent；D1 = 起始日</div>
+  </div>
+  <div style="display: grid; grid-template-columns: 300px repeat(20, minmax(0, 1fr)); gap: 0; font-size: 11px; border: 1px solid #D5D8DD;">
+    <div style="padding: 6px 8px; background: #F0F2F5; border-right: 1px solid #D5D8DD; border-bottom: 1px solid #D5D8DD; font-weight: 600;">任务 / 工作日</div>
+    <div style="grid-column: span 5; padding: 6px 4px; text-align: center; background: #F0F2F5; border-right: 1px solid #D5D8DD; border-bottom: 1px solid #D5D8DD; font-weight: 600;">D1–D5 协议冻结 · 存储</div>
+    <div style="grid-column: span 5; padding: 6px 4px; text-align: center; background: #F0F2F5; border-right: 1px solid #D5D8DD; border-bottom: 1px solid #D5D8DD; font-weight: 600;">D6–D10 规则 · 面板</div>
+    <div style="grid-column: span 5; padding: 6px 4px; text-align: center; background: #F0F2F5; border-right: 1px solid #D5D8DD; border-bottom: 1px solid #D5D8DD; font-weight: 600;">D11–D15 证据 · 报告 · 事件</div>
+    <div style="grid-column: span 3; padding: 6px 4px; text-align: center; background: #F0F2F5; border-right: 1px solid #D5D8DD; border-bottom: 1px solid #D5D8DD; font-weight: 600;">D16–18 安全 · 安装</div>
+    <div style="grid-column: span 2; padding: 6px 4px; text-align: center; background: #F0F2F5; border-bottom: 1px solid #D5D8DD; font-weight: 600;">D19–20</div>
+
+    <div class="r">T1 冻结协议：envelope、退出码、事件身份/注册/纠错、报告事务</div><div style="grid-column: 2 / span 2;" class="c"><div class="b" style="background: #1F6F78;"></div></div><div style="grid-column: 4 / span 18;" class="c"></div>
+    <div class="r">T2 store：15 表迁移、固定视图、预定义查询；importer（1260/1225）</div><div style="grid-column: 2 / span 1;" class="c"></div><div style="grid-column: 3 / span 3;" class="c"><div class="b" style="background: #1F6F78;"></div></div><div style="grid-column: 6 / span 16;" class="c"></div>
+    <div class="r">T3 adapter + policy 离线：typed 响应、第二页 31/37、空响应、锁与账本</div><div style="grid-column: 2 / span 2;" class="c"></div><div style="grid-column: 4 / span 2;" class="c"><div class="b" style="background: #1F6F78;"></div></div><div style="grid-column: 6 / span 16;" class="c"></div>
+    <div class="r">T4 最小根目录 SKILL.md + 环境入口（console script、任意 cwd）</div><div style="grid-column: 2 / span 3;" class="c"></div><div style="grid-column: 5 / span 1;" class="c"><div class="b" style="background: #1F6F78;"></div></div><div style="grid-column: 6 / span 16;" class="c"></div>
+    <div class="r">T5 rules AST：条件树、first-match、计分组、unknown；legacy 私有回归 402 / 交接政策 478</div><div style="grid-column: 2 / span 5;" class="c"></div><div style="grid-column: 7 / span 3;" class="c"><div class="b" style="background: #1F6F78;"></div></div><div style="grid-column: 10 / span 12;" class="c"></div>
+    <div class="r">T6 validate 全套 schema + 语义；match 批次事务</div><div style="grid-column: 2 / span 5;" class="c"></div><div style="grid-column: 7 / span 2;" class="c"><div class="b" style="background: #1F6F78;"></div></div><div style="grid-column: 9 / span 13;" class="c"></div>
+    <div class="r">T7 panel 固定视图 + 固定筛选脚本 + 转义；job list/show</div><div style="grid-column: 2 / span 7;" class="c"></div><div style="grid-column: 9 / span 2;" class="c"><div class="b" style="background: #1F6F78;"></div></div><div style="grid-column: 11 / span 11;" class="c"></div>
+    <div class="r">T8 非作者试合成 demo（暴露安装问题，留修复时间）</div><div style="grid-column: 2 / span 9;" class="c"></div><div style="grid-column: 11 / span 1;" class="c"><div class="b" style="background: #B8741A;"></div></div><div style="grid-column: 12 / span 10;" class="c"></div>
+    <div class="r">T9 deepdive：详情/公司页基础证据、机器信号、bundle</div><div style="grid-column: 2 / span 10;" class="c"></div><div style="grid-column: 12 / span 2;" class="c"><div class="b" style="background: #1F6F78;"></div></div><div style="grid-column: 14 / span 8;" class="c"></div>
+    <div class="r">T10 evidence add + report set 原子提交 + report get/status</div><div style="grid-column: 2 / span 11;" class="c"></div><div style="grid-column: 13 / span 2;" class="c"><div class="b" style="background: #1F6F78;"></div></div><div style="grid-column: 15 / span 7;" class="c"></div>
+    <div class="r">T11 事件流：register、applied 建身份、corrected、时间线、面板 tab</div><div style="grid-column: 2 / span 12;" class="c"></div><div style="grid-column: 14 / span 2;" class="c"><div class="b" style="background: #1F6F78;"></div></div><div style="grid-column: 16 / span 6;" class="c"></div>
+    <div class="r">T12 离线安全/失败场景回归；打包 allowlist；负面扫描真实数据</div><div style="grid-column: 2 / span 14;" class="c"></div><div style="grid-column: 16 / span 2;" class="c"><div class="b" style="background: #1F6F78;"></div></div><div style="grid-column: 18 / span 4;" class="c"></div>
+    <div class="r">T13 受支持环境真实安装；获准条件下小规模真实采集验收（两页正常 + 停机路径）</div><div style="grid-column: 2 / span 15;" class="c"></div><div style="grid-column: 17 / span 2;" class="c"><div class="b" style="background: #B8741A;"></div></div><div style="grid-column: 19 / span 3;" class="c"></div>
+    <div style="padding: 5px 8px; border-right: 1px solid #D5D8DD;">T14 修复缓冲、独立复核、README、beta 包（未过联网门槛 → 离线 beta）</div><div style="grid-column: 2 / span 18;"></div><div style="grid-column: 20 / span 2;"><div class="b" style="background: #B8741A;"></div></div>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-top: 2px;">
+    <div style="border: 1px solid #D5D8DD; border-top: 3px solid #1F6F78; padding: 8px 10px; font-size: 11.5px;"><div style="font-weight: 600;">M1 · D5</div><div style="color: #3C4858;">协议冻结；42 文件私有回归 1260/1225，重导不增；第二页风控路径无第三次导航；事件存储闭环测试通过</div></div>
+    <div style="border: 1px solid #D5D8DD; border-top: 3px solid #1F6F78; padding: 8px 10px; font-size: 11.5px;"><div style="font-weight: 600;">M2 · D10</div><div style="color: #3C4858;">legacy 分数/漏斗通过（S3/A41/B77/C119/D162）；交接政策 +76 岗；任意 cwd 可调；非作者跑通合成 demo</div></div>
+    <div style="border: 1px solid #D5D8DD; border-top: 3px solid #1F6F78; padding: 8px 10px; font-size: 11.5px;"><div style="font-weight: 600;">M3 · D15</div><div style="color: #3C4858;">applied → 回复/纠错闭环；自定义流 register → 列表/tab；中断/幂等/旧版本读取通过；部分证据明确展示</div></div>
+    <div style="border: 1px solid #D5D8DD; border-top: 3px solid #B8741A; padding: 8px 10px; font-size: 11.5px;"><div style="font-weight: 600;">M4 · D18</div><div style="color: #3C4858;">联网门槛、两页正常路径、停机路径各有证据；无授权或平台不可用时不把模拟当真实通过</div></div>
+    <div style="border: 1px solid #D5D8DD; border-top: 3px solid #B8741A; padding: 8px 10px; font-size: 11.5px;"><div style="font-weight: 600;">M5 · D20 发布</div><div style="color: #3C4858;">零未解决阻塞；独立复核；clone → demo 面板 ≤30 分钟；真实单页另计</div></div>
+  </div>
+  <div style="display: flex; gap: 16px; font-size: 11px; color: #3C4858; align-items: center;">
+    <div style="display: flex; gap: 6px; align-items: center;"><div style="width: 24px; height: 10px; background: #1F6F78; border-radius: 2px;"></div>离线可测的 CLI 工作</div>
+    <div style="display: flex; gap: 6px; align-items: center;"><div style="width: 24px; height: 10px; background: #B8741A; border-radius: 2px;"></div>需要非作者、真实登录或平台可用</div>
+    <div style="margin-left: auto; color: #6B7280;">关键路径 T1 → T2 → T3 → T5 → T7 → T9 → T10 → T11 → T13。最可能拖期：T3/T13 采集适配与真实风控行为、T9 两页解析。</div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

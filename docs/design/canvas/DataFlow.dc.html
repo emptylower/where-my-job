@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: "IBM Plex Sans", "PingFang SC", "Noto Sans SC", system-ui, sans-serif; color: #1E2229; }
+    a { color: #1F6F78; } a:hover { color: #164F56; }
+    svg text { font-family: inherit; }
+  </style>
+</helmet>
+<div style="width: 1200px; height: 840px; box-sizing: border-box; background: #FFFFFF; padding: 32px 40px; display: flex; flex-direction: column; gap: 12px;">
+  <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #D5D8DD; padding-bottom: 10px;">
+    <div style="font-size: 20px; font-weight: 600;">D2 · 数据流图（DFD Level 1）</div>
+    <div style="font-size: 12px; color: #6B7280;">矩形 = 外部实体 · 圆角 = 处理 · 开口矩形 = 存储 · 橙色 = 经网络门禁的动作</div>
+  </div>
+  <svg width="1120" height="710" viewBox="0 0 1120 710">
+    <defs>
+      <marker id="ar" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#2F3640"/></marker>
+      <marker id="ao" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#E65100"/></marker>
+    </defs>
+    <rect x="20" y="30" width="160" height="56" fill="#EEF0F3" stroke="#3C4858" stroke-width="1.5"/>
+    <text x="100" y="54" font-size="13" font-weight="600" text-anchor="middle">BOSS（经专用 Chrome）</text>
+    <text x="100" y="72" font-size="11" text-anchor="middle" fill="#3C4858">列表 API · 详情页 · 公司页</text>
+    <rect x="20" y="330" width="160" height="56" fill="#EEF0F3" stroke="#3C4858" stroke-width="1.5"/>
+    <text x="100" y="354" font-size="13" font-weight="600" text-anchor="middle">历史 JSON 文件</text>
+    <text x="100" y="372" font-size="11" text-anchor="middle" fill="#3C4858">42 份，legacy_mapped</text>
+    <rect x="940" y="30" width="160" height="56" fill="#FBF1E1" stroke="#B8741A" stroke-width="1.5"/>
+    <text x="1020" y="54" font-size="13" font-weight="600" text-anchor="middle">Coding Agent</text>
+    <text x="1020" y="72" font-size="11" text-anchor="middle" fill="#3C4858">推理 · 站外工具</text>
+    <rect x="940" y="620" width="160" height="56" fill="#F1E8F4" stroke="#6B3F7A" stroke-width="1.5"/>
+    <text x="1020" y="644" font-size="13" font-weight="600" text-anchor="middle">求职者</text>
+    <text x="1020" y="662" font-size="11" text-anchor="middle" fill="#3C4858">看面板 · 拍板</text>
+
+    <rect x="250" y="20" width="160" height="76" rx="18" fill="#FFF3E0" stroke="#E65100" stroke-width="1.5"/>
+    <text x="330" y="44" font-size="13" font-weight="600" text-anchor="middle">P1 scan</text>
+    <text x="330" y="62" font-size="11" text-anchor="middle" fill="#3C4858">policy 门禁 → adapter</text>
+    <text x="330" y="78" font-size="11" text-anchor="middle" fill="#3C4858">逐响应判风控 · 逐条落库</text>
+
+    <rect x="250" y="140" width="160" height="76" rx="18" fill="#FFF3E0" stroke="#E65100" stroke-width="1.5"/>
+    <text x="330" y="164" font-size="13" font-weight="600" text-anchor="middle">P3 deepdive</text>
+    <text x="330" y="182" font-size="11" text-anchor="middle" fill="#3C4858">两页采集 → evidence</text>
+    <text x="330" y="198" font-size="11" text-anchor="middle" fill="#3C4858">bundle（不可变清单）</text>
+
+    <rect x="250" y="260" width="160" height="76" rx="18" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.5"/>
+    <text x="330" y="284" font-size="13" font-weight="600" text-anchor="middle">P2 match</text>
+    <text x="330" y="302" font-size="11" text-anchor="middle" fill="#3C4858">固定快照 + scoring</text>
+    <text x="330" y="318" font-size="11" text-anchor="middle" fill="#3C4858">事务提交一个批次</text>
+
+    <rect x="250" y="380" width="160" height="76" rx="18" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.5"/>
+    <text x="330" y="404" font-size="13" font-weight="600" text-anchor="middle">P1b import</text>
+    <text x="330" y="422" font-size="11" text-anchor="middle" fill="#3C4858">哈希幂等</text>
+    <text x="330" y="438" font-size="11" text-anchor="middle" fill="#3C4858">1260 观察 / 1225 岗</text>
+
+    <rect x="250" y="500" width="160" height="76" rx="18" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.5"/>
+    <text x="330" y="524" font-size="13" font-weight="600" text-anchor="middle">P6 panel · job list</text>
+    <text x="330" y="542" font-size="11" text-anchor="middle" fill="#3C4858">固定视图 + 预定义查询</text>
+    <text x="330" y="558" font-size="11" text-anchor="middle" fill="#3C4858">转义渲染</text>
+
+    <rect x="700" y="140" width="160" height="76" rx="18" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.5"/>
+    <text x="780" y="164" font-size="13" font-weight="600" text-anchor="middle">P4 report set</text>
+    <text x="780" y="182" font-size="11" text-anchor="middle" fill="#3C4858">evidence add · 引用校验</text>
+    <text x="780" y="198" font-size="11" text-anchor="middle" fill="#3C4858">一次事务插入完整报告</text>
+
+    <rect x="700" y="380" width="160" height="76" rx="18" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.5"/>
+    <text x="780" y="404" font-size="13" font-weight="600" text-anchor="middle">P5 stream / event</text>
+    <text x="780" y="422" font-size="11" text-anchor="middle" fill="#3C4858">register 激活版本</text>
+    <text x="780" y="438" font-size="11" text-anchor="middle" fill="#3C4858">event add 校验 · 纠错链</text>
+
+    <rect x="700" y="20" width="160" height="76" rx="18" fill="#FFFFFF" stroke="#1F6F78" stroke-width="1.5"/>
+    <text x="780" y="44" font-size="13" font-weight="600" text-anchor="middle">P7 validate</text>
+    <text x="780" y="62" font-size="11" text-anchor="middle" fill="#3C4858">Schema + 语义</text>
+    <text x="780" y="78" font-size="11" text-anchor="middle" fill="#3C4858">只检查不激活</text>
+
+    <path d="M480 130 L640 130 M480 130 L480 176 L640 176" fill="none" stroke="#3C4858" stroke-width="1.5"/>
+    <text x="490" y="150" font-size="12" font-weight="600">D1 事实</text>
+    <text x="490" y="168" font-size="11" fill="#3C4858">jobs companies runs run_tasks sightings</text>
+    <path d="M480 220 L640 220 M480 220 L480 266 L640 266" fill="none" stroke="#3C4858" stroke-width="1.5"/>
+    <text x="490" y="240" font-size="12" font-weight="600">D3 证据与报告</text>
+    <text x="490" y="258" font-size="11" fill="#3C4858">evidence bundles deepdives</text>
+    <path d="M480 310 L640 310 M480 310 L480 356 L640 356" fill="none" stroke="#3C4858" stroke-width="1.5"/>
+    <text x="490" y="330" font-size="12" font-weight="600">D2 match_results</text>
+    <text x="490" y="348" font-size="11" fill="#3C4858">批次 · 输入哈希</text>
+    <path d="M480 400 L640 400 M480 400 L480 446 L640 446" fill="none" stroke="#3C4858" stroke-width="1.5"/>
+    <text x="490" y="420" font-size="12" font-weight="600">D4 事件</text>
+    <text x="490" y="438" font-size="11" fill="#3C4858">events applications stream_registry</text>
+    <path d="M480 490 L640 490 M480 490 L480 536 L640 536" fill="none" stroke="#3C4858" stroke-width="1.5"/>
+    <text x="490" y="510" font-size="12" font-weight="600">D5 标注 job_attrs</text>
+    <text x="490" y="528" font-size="11" fill="#3C4858">agent | user</text>
+    <path d="M480 580 L640 580 M480 580 L480 626 L640 626" fill="none" stroke="#E65100" stroke-width="1.5"/>
+    <text x="490" y="600" font-size="12" font-weight="600" fill="#E65100">D6 network_policy_state</text>
+    <text x="490" y="618" font-size="11" fill="#3C4858">预算账本 · 冷却 · 锁</text>
+    <path d="M700 260 L880 260 M700 260 L700 306 L880 306" fill="none" stroke="#3C4858" stroke-width="1.5"/>
+    <text x="710" y="280" font-size="12" font-weight="600">D7 配置文件</text>
+    <text x="710" y="298" font-size="11" fill="#3C4858">profile scoring strategies panel streams（候选）</text>
+    <path d="M700 580 L880 580 M700 580 L700 626 L880 626" fill="none" stroke="#3C4858" stroke-width="1.5"/>
+    <text x="710" y="600" font-size="12" font-weight="600">D8 面板输出</text>
+    <text x="710" y="618" font-size="11" fill="#3C4858">panel/latest.html</text>
+
+    <line x1="180" y1="50" x2="248" y2="50" stroke="#E65100" stroke-width="1.5" marker-end="url(#ao)"/><text x="214" y="42" font-size="10" text-anchor="middle">被动捕获响应</text>
+    <line x1="180" y1="70" x2="248" y2="170" stroke="#E65100" stroke-width="1.5" marker-end="url(#ao)"/><text x="196" y="130" font-size="10">页面文本</text>
+    <line x1="410" y1="60" x2="500" y2="128" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="450" y="88" font-size="10">api_entry + 事实</text>
+    <line x1="410" y1="40" x2="500" y2="586" stroke="#E65100" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#ao)"/><text x="456" y="566" font-size="10" fill="#E65100">预占动作 · 冷却 · 账本</text>
+    <line x1="410" y1="180" x2="500" y2="586" stroke="#E65100" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#ao)"/>
+    <line x1="410" y1="190" x2="478" y2="238" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="430" y="226" font-size="10">evidence(cli)+bundle</text>
+    <line x1="700" y1="280" x2="412" y2="50" stroke="#2F3640" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#ar)"/><text x="560" y="180" font-size="10" fill="#3C4858">strategy</text>
+    <line x1="480" y1="160" x2="412" y2="290" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="418" y="272" font-size="10">读事实快照</text>
+    <line x1="410" y1="310" x2="478" y2="326" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="430" y="345" font-size="10">写批次</text>
+    <line x1="700" y1="290" x2="412" y2="300" stroke="#2F3640" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#ar)"/><text x="560" y="290" font-size="10" fill="#3C4858">scoring</text>
+    <line x1="180" y1="358" x2="248" y2="410" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/>
+    <line x1="410" y1="400" x2="480" y2="170" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="440" y="380" font-size="10">legacy_mapped</text>
+    <line x1="480" y1="150" x2="412" y2="520" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/>
+    <line x1="480" y1="330" x2="412" y2="530" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/>
+    <line x1="480" y1="430" x2="412" y2="540" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/>
+    <line x1="480" y1="520" x2="412" y2="548" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/>
+    <text x="418" y="480" font-size="10">读固定视图 D1–D5</text>
+    <line x1="700" y1="295" x2="412" y2="512" stroke="#2F3640" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#ar)"/><text x="540" y="470" font-size="10" fill="#3C4858">panel.json</text>
+    <line x1="410" y1="560" x2="698" y2="600" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="540" y="570" font-size="10">HTML</text>
+    <line x1="880" y1="605" x2="938" y2="640" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="900" y="612" font-size="10">打开</text>
+    <line x1="410" y1="540" x2="938" y2="70" stroke="#2F3640" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#ar)"/><text x="600" y="330" font-size="10" fill="#3C4858">job list/show 结果（受限字段）</text>
+
+    <line x1="410" y1="150" x2="938" y2="60" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="620" y="112" font-size="10" fill="#3C4858">证据包（≤64KiB，无 raw/画像）</text>
+    <line x1="940" y1="80" x2="862" y2="160" stroke="#B8741A" stroke-width="1.5" marker-end="url(#ar)"/><text x="870" y="118" font-size="10" fill="#B8741A">站外证据 · 结构化报告</text>
+    <line x1="700" y1="190" x2="642" y2="240" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="646" y="212" font-size="10">evidence(agent) + report</text>
+    <line x1="940" y1="70" x2="862" y2="60" stroke="#B8741A" stroke-width="1.5" marker-end="url(#ar)"/><text x="900" y="50" font-size="10" text-anchor="middle" fill="#B8741A">候选 JSON</text>
+    <line x1="862" y1="80" x2="940" y2="90" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="900" y="100" font-size="10" text-anchor="middle">字段级错误</text>
+    <line x1="780" y1="96" x2="780" y2="258" stroke="#2F3640" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#ar)"/><text x="788" y="180" font-size="10">通过后由 agent 写候选文件</text>
+    <line x1="940" y1="75" x2="862" y2="400" stroke="#B8741A" stroke-width="1.5" marker-end="url(#ar)"/><text x="880" y="300" font-size="10" fill="#B8741A">register / event add</text>
+    <line x1="700" y1="420" x2="642" y2="424" stroke="#2F3640" stroke-width="1.5" marker-end="url(#ar)"/><text x="650" y="412" font-size="10">同事务</text>
+    <line x1="700" y1="300" x2="712" y2="380" stroke="#2F3640" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#ar)"/><text x="716" y="345" font-size="10">streams 候选</text>
+    <line x1="940" y1="85" x2="642" y2="512" stroke="#B8741A" stroke-width="1.5" marker-end="url(#ar)"/><text x="760" y="490" font-size="10" fill="#B8741A">attr set（agent）</text>
+    <line x1="1020" y1="620" x2="1020" y2="88" stroke="#6B3F7A" stroke-width="1.5" marker-end="url(#ar)"/><text x="1028" y="350" font-size="10" fill="#6B3F7A">需求 · 回答 · 拍板</text>
+
+    <text x="20" y="700" font-size="11" fill="#6B7280">D1–D6 位于同一 SQLite 文件。LLM 推理发生在 Coding Agent 内部；agent 的模型/工具出站不在本图。v1 无自由 SQL 入口。</text>
+  </svg>
+</div>
+</x-dc>
+</body>
+</html>

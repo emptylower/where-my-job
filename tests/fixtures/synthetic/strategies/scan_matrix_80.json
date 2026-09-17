@@ -1,0 +1,4 @@
+{"schema_version": 1, "name": "八十页边界",
+ "searches": [{"keywords": ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛"],
+               "cities": ["合肥", "上海", "北京", "深圳", "广州"], "pages": 2, "boss_filters": {}}],
+ "budget": {"max_pages_per_run": 80, "pause_between_actions_sec": [12, 22]}}

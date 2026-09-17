@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "stream": "custom.notes",
+  "stream_revision": 1,
+  "subject_kind": "job",
+  "types": {"noted": {"required": [], "fields": {"text": "string"}}},
+  "projection": {"latest_by": "noted"}
+}

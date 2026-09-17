@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+dist/
+build/
+.pytest_cache/
+.omc/
+*.sqlite3
+*.sqlite3-*
+/tests/fixtures/private/

@@ -1,0 +1,24 @@
+{
+  "keyword": "产品经理",
+  "city": "合肥",
+  "filters": {},
+  "filter_desc": [],
+  "scraped_at": "2026-09-14T11:25:00.000000",
+  "total": 2,
+  "jobs": [
+    {"title": "AI产品经理", "salary": "16-26K·14薪", "salary_source": "api", "location": "合肥·蜀山区·政务区",
+     "tags": "1-3年 | 本科", "boss_name": "合成科技一号", "boss_title": "产品总监", "boss_active_status": "在线",
+     "company_scale": "100-499人", "company_stage": "A轮", "company_industry": "人工智能",
+     "job_labels": "1-3年 | 本科", "skills": "AI产品 | Agent | B端产品", "security_id": "SYN-SECURITY-1",
+     "lid": "SYN.lid.4", "encrypt_job_id": "SYN0001aaaa", "encrypt_boss_id": "SYNBOSS1", "encrypt_brand_id": "SYNCO1",
+     "job_link": "https://www.zhipin.com/job_detail/SYN0001aaaa.html", "company_link": "https://www.zhipin.com/gongsi/SYNCO1.html",
+     "welfare": "五险一金 | 年终奖", "job_id": "0000000000000001"},
+    {"title": "B端产品经理", "salary": "12-18K", "salary_source": "api", "location": "合肥·高新区",
+     "tags": "3-5年 | 本科", "boss_name": "合成科技一号", "boss_title": "HRBP", "boss_active_status": "本周活跃",
+     "company_scale": "100-499人", "company_stage": "A轮", "company_industry": "人工智能",
+     "job_labels": "3-5年 | 本科", "skills": "B端产品 | 数据分析", "security_id": "SYN-SECURITY-4",
+     "lid": "SYN.lid.5", "encrypt_job_id": "SYN0004dddd", "encrypt_boss_id": "SYNBOSS1", "encrypt_brand_id": "SYNCO1",
+     "job_link": "https://www.zhipin.com/job_detail/SYN0004dddd.html", "company_link": "https://www.zhipin.com/gongsi/SYNCO1.html",
+     "welfare": "五险一金", "job_id": "0000000000000004"}
+  ]
+}

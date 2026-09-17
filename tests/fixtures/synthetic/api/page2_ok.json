@@ -1,0 +1,8 @@
+{"code": 0, "message": "Success", "zpData": {"hasMore": true, "jobList": [
+  {"encryptJobId": "SYN0104dddd", "jobName": "AI 产品运营", "salaryDesc": "10-15K", "cityName": "合肥",
+   "areaDistrict": "高新区", "businessDistrict": "", "jobExperience": "经验不限", "jobDegree": "本科",
+   "brandName": "合成科技四号", "bossTitle": "运营经理", "bossOnline": true, "brandScaleName": "20-99人",
+   "brandStageName": "天使轮", "brandIndustry": "人工智能", "jobLabels": ["经验不限", "本科"],
+   "skills": ["Agent"], "welfareList": [], "securityId": "SYN-SECURITY-104", "lid": "SYN.lid.104",
+   "encryptBossId": "SYNBOSS104", "encryptBrandId": "SYNCO4"}
+]}}

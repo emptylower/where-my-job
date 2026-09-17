@@ -1,0 +1,19 @@
+{
+  "kind": "job_detail_page",
+  "url": "https://www.zhipin.com/job_detail/SYN0001aaaa.html",
+  "captured_at": "2026-09-14T09:00:00Z",
+  "excerpt": "职位描述\n负责 AI 产品从 0 到 1……（合成 JD，共 5 条职责 4 条要求）",
+  "full_text": "职位描述\n负责 AI 产品从 0 到 1\n……\n任职要求\n3 年产品经验\n……\n合成全文，长度足够。",
+  "structured": {
+    "jd_sections": {"responsibilities": 5, "requirements": 4},
+    "boss_title": "产品总监",
+    "boss_active_status": "在线",
+    "ld_upDate_raw": "2026-08-20 10:12:00",
+    "ld_json_upDate": "2026-08-20 10:12:00",
+    "detail_salary_text": "15-25K·14薪",
+    "detail_exp": "1-3年",
+    "detail_degree": "本科"
+  },
+  "parser_version": "detail-v1",
+  "completeness": "complete"
+}

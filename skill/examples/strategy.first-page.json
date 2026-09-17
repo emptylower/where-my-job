@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "name": "首次单页合成配置",
+  "searches": [
+    {
+      "keywords": [
+        "AI产品经理"
+      ],
+      "cities": [
+        "合肥"
+      ],
+      "pages": 1,
+      "boss_filters": {}
+    }
+  ],
+  "budget": {
+    "max_pages_per_run": 1,
+    "pause_between_actions_sec": [
+      12,
+      22
+    ]
+  }
+}

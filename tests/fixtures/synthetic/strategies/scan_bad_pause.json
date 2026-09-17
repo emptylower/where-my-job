@@ -1,0 +1,3 @@
+{"schema_version": 1, "name": "间隔过短",
+ "searches": [{"keywords": ["AI产品经理"], "cities": ["合肥"], "pages": 1, "boss_filters": {}}],
+ "budget": {"max_pages_per_run": 1, "pause_between_actions_sec": [5, 22]}}

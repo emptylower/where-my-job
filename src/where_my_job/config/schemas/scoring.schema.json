@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "profile_revision", "classify", "score", "tiers", "fallback_tier"],
+  "$defs": {
+    "cond": {"type": "object"},
+    "rule": {"type": "object", "additionalProperties": false,
+             "required": ["id", "reason"],
+             "properties": {"id": {"type": "string"}, "reason": {"type": "string", "minLength": 1}, "when": {"$ref": "#/$defs/cond"},
+                            "add": {"type": "number"}, "group": {"type": "string", "minLength": 1},
+                            "skills_hit": {"type": "object", "additionalProperties": false, "required": ["categories"],
+                                           "properties": {"field": {"type": "string"}, "categories": {"type": "object", "minProperties": 1, "additionalProperties": {"type": "string"}},
+                                                          "per_category": {"type": "number", "minimum": 0}, "cap": {"type": "number", "minimum": 0}, "flags": {"type": "string", "enum": ["i"]}}}}}
+  },
+  "properties": {
+    "schema_version": {"const": 2},
+    "profile_revision": {"type": "string", "minLength": 1},
+    "campus_policy": {"type": "string", "enum": ["auto", "include", "exclude"]},
+    "experience_allowlist": {"type": "array", "items": {"type": "string"}},
+    "input_selection": {"type": "string", "enum": ["latest", "legacy-20260914"]},
+    "legacy_input": {"type": "object", "additionalProperties": false, "required": ["files"],
+                     "properties": {"files": {"type": "array", "minItems": 1,
+                                              "items": {"type": "object", "additionalProperties": false, "required": ["name", "sha256"],
+                                                        "properties": {"name": {"type": "string", "pattern": "^[^_/\\\\]+_[^/\\\\]+\\.json$"},
+                                                                       "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}}}}},
+    "classify": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["dir", "when"],
+                 "properties": {"dir": {"type": ["string", "null"]}, "when": {"$ref": "#/$defs/cond"}}}},
+    "exclude": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["id", "when", "reason"],
+                "properties": {"id": {"type": "string"}, "when": {"$ref": "#/$defs/cond"}, "reason": {"type": "string", "minLength": 1}}}},
+    "score": {"type": "object", "additionalProperties": {"type": "object", "additionalProperties": false, "required": ["base", "base_reason"],
+              "properties": {"base": {"type": "number"}, "base_reason": {"type": "string", "minLength": 1},
+                             "rules": {"type": "array", "items": {"$ref": "#/$defs/rule"}},
+                             "groups": {"type": "object", "additionalProperties": {"type": "object", "additionalProperties": false,
+                                        "properties": {"min": {"type": "number"}, "max": {"type": "number"}}}}}}},
+    "global": {"type": "array", "items": {"$ref": "#/$defs/rule"}},
+    "tiers": {"type": "object", "minProperties": 1, "additionalProperties": {"type": "number"}},
+    "fallback_tier": {"type": "string", "minLength": 1}
+  }
+}

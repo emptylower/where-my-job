@@ -1,0 +1,4 @@
+{"schema_version": 1, "name": "七词六城两页",
+ "searches": [{"keywords": ["AI产品经理", "AI全栈", "产品经理", "芯片验证", "数字后端", "芯片测试", "AI训练师"],
+               "cities": ["合肥", "杭州", "武汉", "上海", "广州", "深圳"], "pages": 2, "boss_filters": {}}],
+ "budget": {"max_pages_per_run": 80, "pause_between_actions_sec": [12, 22]}}

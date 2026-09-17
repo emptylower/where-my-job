@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: "IBM Plex Sans", "PingFang SC", "Noto Sans SC", system-ui, sans-serif; color: #1E2229; }
+    a { color: #1F6F78; } a:hover { color: #164F56; }
+    .mono { font-family: "IBM Plex Mono", "PingFang SC", Menlo, monospace; }
+    td, th { padding: 5px 8px; border: 1px solid #D5D8DD; vertical-align: top; }
+    th { background: #F0F2F5; text-align: left; font-weight: 600; }
+  </style>
+</helmet>
+<div style="width: 1200px; height: 900px; box-sizing: border-box; background: #FFFFFF; padding: 32px 40px; display: flex; flex-direction: column; gap: 12px;">
+  <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #D5D8DD; padding-bottom: 10px;">
+    <div style="font-size: 20px; font-weight: 600;">P4 · 范围、里程碑、架构决策记录（设计 v3 §10、§14）</div>
+    <div style="font-size: 12px; color: #6B7280;">v1 = 四周 beta 目标 · v1.1 = 加固项 · v2 = 候选 · 永不 = 明确排除</div>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px;">
+    <div style="border: 1px solid #1F6F78; border-radius: 4px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-size: 14px; font-weight: 600; color: #1F6F78;">v1（四周 beta）</div>
+      <div style="font-size: 11.5px; color: #3C4858;">macOS + Chrome；Claude Code 首发流程；合成 demo；私有导入；受控浅扫描（门禁/逐响应风控/预算/冷却）；规则匹配（AST、批次）；固定面板 + 柱状图；单岗详情与可选公司页基础证据；evidence add；原子 report set；事件流（注册/版本/纠错/固定投递状态/时间线）；job list/show；手动 delete/prune；envelope + 五档退出码；离线回归；30 分钟双路径</div>
+    </div>
+    <div style="border: 1px solid #B8741A; border-radius: 4px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-size: 14px; font-weight: 600; color: #B8741A;">v1.1（发布后第一迭代）</div>
+      <div style="font-size: 11.5px; color: #3C4858;">自由 SQL 入口 + 对象授权 + 可打断执行器；每流 SQL 视图、latest_by、跨类型合并；settings.retention_days 与定时清理；CSP 散列策略；导出；Edge / Linux 试用记录</div>
+    </div>
+    <div style="border: 1px solid #6B7280; border-radius: 4px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-size: 14px; font-weight: 600; color: #6B7280;">v2（候选，按反馈）</div>
+      <div style="font-size: 11.5px; color: #3C4858;">通用扩展表与 DDL；任意 panel SQL；多策略对比；确定性派生函数（如年结余）；批量 agent 精修；额外图表；跨平台承诺；专用工商 MCP 集成</div>
+    </div>
+    <div style="border: 1px solid #A8336B; border-radius: 4px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-size: 14px; font-weight: 600; color: #A8336B;">永不</div>
+      <div style="font-size: 11.5px; color: #3C4858;">自动投递、自动打招呼；服务端组件；多用户汇聚或岗位真实性数据库；商用/转售；规避平台访问控制；内建 LLM 与凭证管理；真实性概率</div>
+    </div>
+  </div>
+  <table style="border-collapse: collapse; width: 100%; font-size: 11px;">
+    <thead><tr><th style="width: 70px;">里程碑</th><th style="width: 50px;">日期</th><th>可执行验收</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">M1</td><td>D5</td><td>协议冻结（envelope/退出码/事件身份/注册/纠错/报告事务）；import 私有 42 文件 = 1260 observations / 1225 jobs，重导不增；离线注入第二页 31/37 无第三次导航；事件存储闭环通过</td></tr>
+      <tr><td class="mono">M2</td><td>D10</td><td>legacy 私有回归 402 与 S3/A41/B77/C119/D162；交接政策 include = 478（差异恰 76）；任意 cwd 可调；一名非作者跑通合成 demo</td></tr>
+      <tr><td class="mono">M3</td><td>D15</td><td>首次 applied → replied → interview / corrected 闭环；custom 流 register → 列表/tab；中断恢复、幂等、旧版本读取；部分证据 partial 与完整报告 complete 并存</td></tr>
+      <tr><td class="mono">M4</td><td>D18</td><td>离线安全/失败回归通过；打包 allowlist 与负面扫描通过；受支持环境真实安装；获准条件下两页正常路径与停机路径各有证据</td></tr>
+      <tr><td class="mono">M5</td><td>D20</td><td>零未解决阻塞；独立复核；clone → demo 面板 ≤30 分钟；真实单页面板另计；未过联网门槛只发禁用在线适配器的离线 beta</td></tr>
+    </tbody>
+  </table>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+    <div style="border-left: 3px solid #1F6F78; padding: 8px 12px; background: #F7F8FA; font-size: 11.5px; color: #3C4858; display: flex; flex-direction: column; gap: 3px;">
+      <div style="font-weight: 600; color: #1E2229;">架构决策记录（ADR）</div>
+      <div>ADR-1 形态：确定性 CLI + SKILL.md；agent 单向调用；CLI 不调用 LLM</div>
+      <div>ADR-2 数据：固定核心层 + 受约束标注层 + 声明式事件流；无用户 DDL</div>
+      <div>ADR-3 策略、规则、面板、流声明全部为版本化 JSON，validate 与 register 分离</div>
+      <div>ADR-4 采集：自有 adapter 在映射前保存 api_entry；vendor 只复用低层原语</div>
+      <div>ADR-5 网络：统一门禁、逐响应判风控、持久预算与冷却、同 profile 单锁</div>
+      <div>ADR-6 证据：不可变 bundle + 原子 report set；结论三值且标推断，无百分比</div>
+      <div>ADR-7 站外调查归 agent；CLI 只做站内两页</div>
+      <div>ADR-8 v1 无自由 SQL；固定视图与预定义查询</div>
+      <div>ADR-9 公开制品只含合成数据；真实回归私有</div>
+      <div>ADR-10 留存默认不过期，只有手动清理</div>
+      <div>ADR-11 隐私承诺限于 CLI 自身；agent 出站由用户环境决定并在访谈前告知</div>
+    </div>
+    <div style="border-left: 3px solid #B8741A; padding: 8px 12px; background: #F7F8FA; font-size: 11.5px; color: #3C4858; display: flex; flex-direction: column; gap: 3px;">
+      <div style="font-weight: 600; color: #1E2229;">开放问题（不阻塞离线开发）</div>
+      <div>Q1 BOSS 当时协议与允许范围：在线发布门槛，本轮未核验</div>
+      <div>Q2 响应结构、筛选码、真招字段含义：最小真实验证后固定适配器版本</div>
+      <div>Q3 精确分页关联与 Chrome 行为：不能关联时返回 partial</div>
+      <div>Q4 默认预算与 4 小时冷却：保守限制，不宣称安全，不以一次成功放宽</div>
+      <div>Q5 校园政策：已定，由经验范围推导（经验不限/在校/应届→包含；仅年限档→排除），可显式覆盖</div>
+      <div>Q6 985/211"优先"：点名 JD 提取"明确要求/优先/未说明"，歧义标未知</div>
+      <div>Q7 跨 agent、Linux/Windows/Edge：逐项试用后增加</div>
+      <div>Q8 招聘信号有效性：多画像本地反馈；无校准不提供概率</div>
+      <div>Q9 事件流表达不了的需求、复杂公式、多策略：v2</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
