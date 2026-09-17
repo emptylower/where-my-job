@@ -328,3 +328,37 @@ def test_page_text_alone_does_not_consume_a_login_action(cli, wmj_home, clock, f
     assert rc == 0 and env["data"]["login"]["status"] == "waiting_scan"
     assert env["data"]["login"]["notes"] == [] and t.clicks == []
     assert _ledger_kinds(wmj_home, clock) == ["login"]
+
+def test_login_start_raises_the_window_and_reports_the_browser_as_the_scan_surface(cli, wmj_home, fake):
+    """扫码面是浏览器窗口，不是终端输出：GUI / TUI 前端根本没有"展开命令输出"这回事。
+    导航成功就把标签页与窗口提到前台，并把结果如实写进 envelope，让 agent 有机器可读依据。"""
+    install, _ = fake
+    t = install([{"url": LOGIN, "qr": A}])
+    rc, env, err = cli(["login", "start"])
+    assert rc == 0, env
+    view = env["data"]["login"]
+    assert view["surface"] == "browser" and view["window_raised"] is True
+    assert t.activations == 1                                  # 导航成功后置前一次，不多不少
+    assert "专用 Chrome 窗口" in view["next_step"]
+    assert _codes(err) == [A]                                  # 字符画仍然画，作为终端界面的备用显示
+
+def test_window_raise_failure_is_reported_not_fatal(cli, wmj_home, fake, monkeypatch):
+    install, _ = fake
+    t = install([{"url": LOGIN, "qr": A}])
+    t.activate_fails = True
+    rc, env, _ = cli(["login", "start"])
+    assert rc == 0
+    view = env["data"]["login"]
+    assert view["status"] == "waiting_scan" and view["surface"] == "browser" and view["window_raised"] is False
+
+def test_status_polling_does_not_steal_focus_but_show_qr_does(cli, wmj_home, fake):
+    """轮询每 30 秒抢一次焦点比看不见二维码更难用：只有用户说"看不到"时才重新置前。"""
+    install, _ = fake
+    t = install([{"url": LOGIN, "qr": A}, {"url": LOGIN, "qr": A}, {"url": LOGIN, "qr": A}])
+    assert cli(["login", "start"])[0] == 0
+    assert t.activations == 1
+    assert cli(["login", "status", "--wait", "0"])[0] == 0
+    assert t.activations == 1                                  # 普通轮询不置前
+    rc, env, _ = cli(["login", "status", "--wait", "0", "--show-qr"])
+    assert rc == 0 and t.activations == 2                      # 显式重画才置前
+    assert env["data"]["login"]["surface"] == "browser"

@@ -91,6 +91,10 @@ class FakeTransport:
             self._page = copy.deepcopy(self.script.pop(0)[1])
         return {"id": 1, "result": {"frameId": self.frame_id, "loaderId": self._doc["loader_id"]}}
 
+    def activate(self) -> bool:
+        self.activated = self.activated + 1 if hasattr(self, "activated") else 1
+        return True
+
     def scroll_bottom(self) -> None:
         self.scrolls += 1
         self._page_no += 1

@@ -1,14 +1,21 @@
 # src/where_my_job/config/search_codes.py
-"""BOSS 服务端筛选码表与首发内置七城城市码（唯一来源，纯常量与纯函数）。
+"""BOSS 服务端筛选码表与城市码解析（唯一来源，纯常量与纯函数）。
 码值与上游固定版本（commit eb5a8e646d4e4bfc024cf53f2a5b543ad8d75edc）的 *_MAP 一致；子计划 05 的
-adapter/codes.py 只 re-export 本模块，不另建码表。首发只内置下列七城；其余城市需用户提供码并记录来源。"""
+adapter/codes.py 只 re-export 本模块，不另建码表。
+
+城市**不是白名单**：平台用的是中国天气网城市码（`101` + 6 位），全国通用。裸码一律放行；
+`CITY_CODES` 只是几个常用城市的便利名，策略文件里的 `city_codes` 映射优先于它。
+不内置全国城市表——没有可信来源，自己编出来的码就是静默错值。"""
 from __future__ import annotations
+import re
 from dataclasses import dataclass
+from typing import Mapping
 
 class UnknownCode(ValueError):
     pass
 
-CITY_CODES: dict[str, str] = {
+CITY_CODE_RE = re.compile(r"101\d{6}")            # 平台城市码形如 101270100（中国天气网体系）
+CITY_CODES: dict[str, str] = {                    # 便利名，不是白名单
     "合肥": "101220100", "上海": "101020100", "北京": "101010100", "深圳": "101280600",
     "广州": "101280100", "杭州": "101210100", "武汉": "101200100",
 }
@@ -40,21 +47,29 @@ class CompiledFilter:
     code: str
     label: str
 
-def city_code(name_or_code: str) -> str:
+def city_code(name_or_code: str, extra: Mapping[str, str] | None = None) -> str:
+    """解析顺序：策略自带映射 → 内置便利名 → 裸城市码。三条都不中才报错。"""
     if not isinstance(name_or_code, str):
         raise UnknownCode(f"城市必须是字符串: {name_or_code!r}")
     s = name_or_code.strip()
+    if extra and s in extra:
+        return extra[s]
     if s in CITY_CODES:
         return CITY_CODES[s]
-    if s.isdigit() and s in CITY_CODES.values():
+    if CITY_CODE_RE.fullmatch(s):
         return s
-    raise UnknownCode(f"未知城市或城市码: {s}（首发内置：{'、'.join(CITY_CODES)}）")
+    raise UnknownCode(f"未知城市名: {s}（请直接写城市码，形如 101270100；"
+                      f"或在策略的 city_codes 里给出 \"{s}\" 对应的码。内置便利名：{'、'.join(CITY_CODES)}）")
 
-def city_name(code: str) -> str:
+def city_name(code: str, extra: Mapping[str, str] | None = None) -> str:
+    """反查显示名。查不到就用码本身当显示名——我们不给平台的码编名字。"""
+    for name, c in (extra or {}).items():
+        if c == code:
+            return name
     for name, c in CITY_CODES.items():
         if c == code:
             return name
-    raise UnknownCode(f"未知城市码: {code}")
+    return code
 
 def compile_filter(param: str, name_or_code: str) -> CompiledFilter:
     table = FILTER_TABLES.get(param)

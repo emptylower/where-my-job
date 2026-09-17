@@ -36,6 +36,8 @@ class FakeLoginTransport:
         self.navigations: list[str] = []
         self.clicks: list[str] = []
         self.screenshots = 0
+        self.activations = 0
+        self.activate_fails = False
         self.closed = False
         self.detached = False
         self.tab_open = True
@@ -78,6 +80,11 @@ class FakeLoginTransport:
 
     def _current(self) -> dict:
         return self.pages[max(self.index, 0)]
+
+    def activate(self) -> bool:
+        """真实实现调 Target.activateTarget + Page.bringToFront；置前失败不致命，返回 False。"""
+        self.activations += 1
+        return not self.activate_fails
 
     def navigate(self, url: str) -> dict:
         self.navigations.append(url)

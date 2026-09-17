@@ -9,6 +9,18 @@ def test_city_code_known_and_unknown():
     with pytest.raises(sc.UnknownCode):
         sc.city_code("火星")
 
+def test_city_is_not_a_whitelist():
+    """平台用中国天气网城市码（101 + 6 位），全国通用：裸码一律放行，内置七城只是便利名。
+    我们不内置全国城市表——没有可信来源，编出来的码就是静默错值。"""
+    assert sc.city_code("101270100") == "101270100"          # 内置里没有的城市，直接给码
+    assert sc.city_name("101270100") == "101270100"          # 学不到名字就用码当显示名，不编
+    assert sc.city_code("成都", {"成都": "101270100"}) == "101270100"
+    assert sc.city_name("101270100", {"成都": "101270100"}) == "成都"
+    for bad in ("火星", "10127010", "1012701000", "201270100", "101270a00", ""):
+        with pytest.raises(sc.UnknownCode):
+            sc.city_code(bad)
+    assert "首发内置" not in str(pytest.raises(sc.UnknownCode, sc.city_code, "火星").value)
+
 def test_compile_filter_label_and_code_same_value():
     assert sc.compile_filter("salary", "405") == sc.CompiledFilter(param="salary", code="405", label="10-20K")
     assert sc.compile_filter("salary", "10-20K").code == "405"

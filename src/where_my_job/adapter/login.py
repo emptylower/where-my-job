@@ -82,8 +82,15 @@ class LoginPage:
     def __init__(self, transport: Transport, *, monotonic: Callable[[], float]):
         self.t = transport
         self.monotonic = monotonic
+        self.window_raised = False                  # 是否成功把登录标签页与窗口提到前台
         transport.set_document_policy(decide_document)
         transport.set_document_guard(True)              # 登录全程拦截：没有时序敏感的握手，且要挡住风控跳转
+
+    def activate(self) -> bool:
+        """把登录标签页与窗口提到前台。只在"该让用户去扫"的时刻调用（login start、显式重画二维码），
+        status 轮询期间不调用——每 30 秒抢一次焦点比看不见二维码更难用。"""
+        self.window_raised = bool(self.t.activate())
+        return self.window_raised
 
     def _risk_blocked(self) -> bool:
         return any(state == "blocked" for _, state, _main in self.t.take_blocked_documents())
@@ -101,6 +108,7 @@ class LoginPage:
         result = reply.get("result") if isinstance(reply, dict) else None
         if not isinstance(result, dict) or reply.get("error") is not None or result.get("errorText"):
             return LoginObservation("unknown", "navigation_failed")
+        self.activate()                             # 扫码面是浏览器窗口：导航成功就立刻让用户看得见
         return None
 
     def observe(self, *, wait: float, known_digest: str | None, allow_toggle: bool,

@@ -181,3 +181,52 @@ def test_cli_scan_puts_run_id_top_level(cli, monkeypatch, tmp_path, clock):
     monkeypatch.setattr(scan_svc, "make_pacing", lambda c: (Sleeper(clock), lambda lo, hi: lo))
     rc, env, _ = cli(["scan", "--strategy", _strategy(tmp_path, pages=1)])
     assert rc == 0 and env["run_id"].startswith("run_") and "SYN-SECURITY" not in json.dumps(env)
+
+def test_partial_runs_what_fits_and_defers_the_rest(ctx, fake, tmp_path):
+    """用户在 --dry-run 的 coverage 上确认过范围之后带 --partial：先跑当日额度内的，
+    其余照样登记为任务再标 skipped，退出 4 并交代欠了多少——不是拒绝，也不是悄悄缩小范围。"""
+    install, box = fake
+    page = load_fixture("api/page1_ok.json")
+    install([("joblist", page)] * 4)
+    led = Ledger(ctx.conn, ctx.clock, ctx.home)
+    with db.write_tx(ctx.conn):
+        for _ in range(78):                                    # 只剩 2 次额度
+            led.reserve("list_page", run_id="earlier")
+    with pytest.raises(Partial) as ei:
+        scan_svc.run(ctx, _strategy(tmp_path, pages=4), partial=True)
+    data = ei.value.data
+    assert data["planned"] == 4 and data["completed"] == 2     # planned 报的是用户要的全量
+    assert data["deferred_actions"] == 2 and data["deferred_reason"] == "budget_24h"
+    assert len(data["deferred_task_keys"]) == 2 and all("p" in k for k in data["deferred_task_keys"])
+    statuses = _statuses(ctx, ei.value.run_id)
+    assert [s for _, s, _ in statuses] == ["ok", "ok", "skipped", "skipped"]
+    assert {m for _, s, m in statuses if s == "skipped"} == {"budget_24h_exhausted"}
+    assert _ledger_n(ctx) == 80                                # 用满当日额度，一次都不超
+
+def test_partial_is_a_no_op_when_the_plan_already_fits(ctx, fake, tmp_path):
+    install, _ = fake
+    install([("joblist", load_fixture("api/last_page_ok.json"))])
+    data, run_id = scan_svc.run(ctx, _strategy(tmp_path, pages=1), partial=True)
+    assert "deferred_actions" not in data and data["planned"] == 1 and data["completed"] == 1
+
+def test_dry_run_reports_shortfall_instead_of_blocking(ctx, tmp_path, monkeypatch):
+    """额度不够不是停止条件，是要如实报给用户的数字：dry-run 不联网、不写任何状态，
+    退出 3 会被 agent 当成风控停手，于是它学会了只敢要一页。"""
+    led = Ledger(ctx.conn, ctx.clock, ctx.home)
+    with db.write_tx(ctx.conn):
+        for _ in range(78):
+            led.reserve("list_page", run_id="earlier")
+    out = scan_svc.dry_run(ctx.home, ctx.clock, _strategy(tmp_path, pages=5))
+    assert out["planned_actions"] == 5
+    assert out["coverage"] == {"fits_budget": False, "planned_actions": 5, "remaining_24h": 2,
+                               "tasks_today": 2, "tasks_deferred": 3}
+
+def test_dry_run_still_blocks_on_cooldown(ctx, tmp_path):
+    """额度放行，冷却不放行：退出 3 的语义留给真正该停手的事。"""
+    from where_my_job.policy.gate import Gate
+    gate = Gate(ctx)
+    with db.write_tx(ctx.conn):
+        gate.ledger.set_cooldown("risk_detected")
+    with pytest.raises(Blocked) as ei:
+        scan_svc.dry_run(ctx.home, ctx.clock, _strategy(tmp_path, pages=1))
+    assert ei.value.code == "COOLDOWN_ACTIVE"

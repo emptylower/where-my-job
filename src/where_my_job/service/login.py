@@ -29,15 +29,17 @@ QR_CAPTION = "扫码登录：用 BOSS 直聘 App 扫描下面的二维码，并�
 TEST_QR_CAPTION = "二维码显示自检：用手机相机扫描下面这张测试码（与 BOSS 无关，不联网）"
 TEST_QR_PAYLOAD = "where-my-job 二维码自检".encode("utf-8")
 
-NEXT_SHOW_QR = ("二维码已画在这条命令的输出里：不要把它抄进回复，也不要只给图片路径或用读图工具代替；"
-                "用一句话请用户展开这条命令的输出扫码（或扫专用 Chrome 窗口里的二维码）并在手机上确认，"
-                "然后马上运行 where-my-job login status --wait 30")
-NEXT_QR_UPDATED = ("旧二维码已失效，新的已画在这条命令的输出里：用一句话提醒用户扫新的，"
+NEXT_SHOW_QR = ("二维码已经显示在专用 Chrome 窗口里，窗口已置前：用一句话请用户扫那个窗口里的二维码并在手机上确认，"
+                "然后马上运行 where-my-job login status --wait 30。"
+                "命令输出里的字符画只是备用显示，终端界面才提；不要把二维码抄进回复，"
+                "也不要只给图片路径或用读图工具代替。`data.login.window_raised` 为 false 时，多提一句请用户切到那个 Chrome 窗口")
+NEXT_QR_UPDATED = ("旧二维码已失效，新的已经显示在专用 Chrome 窗口里：用一句话提醒用户扫新的，"
                    "然后马上运行 where-my-job login status --wait 30")
 NEXT_WAITING = ("用户还没有确认：不要重复说话，继续运行 where-my-job login status --wait 30，直到 status 为 confirmed；"
-                "用户说扫不出来时运行 where-my-job login status --wait 0 --show-qr 重新画一次，浅色背景终端再加 --light-terminal")
-NEXT_NO_QR = ("登录页上没有识别到二维码：请用户直接扫专用 Chrome 窗口里的二维码，"
-              "然后运行 where-my-job login status --wait 30")
+                "用户说看不到二维码时运行 where-my-job login status --wait 0 --show-qr，它会把窗口重新置前并重画一次字符画"
+                "（浅色背景终端再加 --light-terminal）")
+NEXT_NO_QR = ("本工具没能从页面上识别出二维码，但登录页就开在专用 Chrome 窗口里："
+              "请用户直接扫那个窗口，然后运行 where-my-job login status --wait 30")
 NEXT_DONE = "登录已完成：用一句话告诉用户已登录，然后继续当前场景的下一步"
 NEXT_TEST_QR = ("请用户按 ctrl+o 展开这条命令的输出，用手机相机扫这张测试码；扫得出来就照这个画法继续，"
                 "扫不出来换一种：where-my-job login test-qr --light-terminal（浅色背景终端）。"
@@ -124,9 +126,14 @@ def test_qr(ctx, *, light_terminal: bool = False) -> dict:
     _draw_qr(ctx, TEST_QR_PAYLOAD, TEST_QR_CAPTION, light_terminal)
     return {"login": {"status": "test_drawing", "light_terminal": light_terminal, "next_step": NEXT_TEST_QR}}
 
-def _view(status: str, state: dict | None, next_step: str, qr_png: str | None, notes: list | None = None) -> dict:
+def _view(status: str, state: dict | None, next_step: str, qr_png: str | None, notes: list | None = None,
+          surface: str | None = None, window_raised: bool | None = None) -> dict:
+    """surface 是给 agent 的机器可读依据：扫码面在哪。
+    `browser` = 登录页就开在专用 Chrome 窗口里（二维码本来就是从那个窗口截下来的，用户扫窗口一定有效）；
+    window_raised = 本工具有没有成功把那个窗口提到前台。两者都为 None 表示当前没有可扫的登录页。"""
     return {"login": {"status": status, "qr_png": qr_png, "refreshes": (state or {}).get("refreshes", 0),
-                      "notes": list(notes or []), "next_step": next_step}}
+                      "notes": list(notes or []), "surface": surface, "window_raised": window_raised,
+                      "next_step": next_step}}
 
 def _login_notes(obs) -> list:
     """只回传本工具自己的常量，不回传页面内容。"""
@@ -198,10 +205,12 @@ def start(ctx, launcher=None, *, light_terminal: bool = False, dark_terminal: bo
         _write_state(ctx.home, state)
         keep["tab"] = True
         if obs.state == "qr":
-            return _view("waiting_scan", state, NEXT_SHOW_QR, qr_png)
+            return _view("waiting_scan", state, NEXT_SHOW_QR, qr_png,
+                         surface="browser", window_raised=page.window_raised)
         if obs.screenshot_failures:
             ctx.warnings.append("专用浏览器截图不可用，未能识别二维码")
-        return _view("qr_not_found", state, NEXT_NO_QR, None)
+        return _view("qr_not_found", state, NEXT_NO_QR, None,
+                     surface="browser", window_raised=page.window_raised)
 
     out = network_run.execute(ctx, gate, actions=1, kind="scan", config={"login": True}, body=body)
     if out.primary is not None:
@@ -252,6 +261,8 @@ def status(ctx, *, wait: int = DEFAULT_STATUS_WAIT_SEC, launcher=None, show_qr: 
                 return True
 
             page = page_mod.LoginPage(transport, monotonic=ctx.clock.monotonic)
+            if show_qr:                               # 用户说看不到：把窗口重新提到前台，再重画一次
+                page.activate()
             obs = page.observe(wait=float(wait), known_digest=state["qr_digest"],
                                allow_toggle=state["qr_digest"] is None, refresh=refresh, report_current=show_qr)
             if obs.state == "logged_in":
@@ -265,12 +276,16 @@ def status(ctx, *, wait: int = DEFAULT_STATUS_WAIT_SEC, launcher=None, show_qr: 
                 qr_png = _save_qr(ctx, obs.payload, light_terminal=light_terminal)
                 _write_state(ctx.home, state)
                 if changed:
-                    return _view("qr_updated", state, NEXT_QR_UPDATED, qr_png, _login_notes(obs))
-                return _view("waiting_scan", state, NEXT_SHOW_QR, qr_png, _login_notes(obs))
+                    return _view("qr_updated", state, NEXT_QR_UPDATED, qr_png, _login_notes(obs),
+                                 surface="browser", window_raised=page.window_raised)
+                return _view("waiting_scan", state, NEXT_SHOW_QR, qr_png, _login_notes(obs),
+                             surface="browser", window_raised=page.window_raised)
             if obs.state == "waiting":
                 if state["qr_digest"] is None:
-                    return _view("qr_not_found", state, NEXT_NO_QR, None, _login_notes(obs))
-                return _view("waiting_scan", state, NEXT_WAITING, str(_qr_path(ctx.home)), _login_notes(obs))
+                    return _view("qr_not_found", state, NEXT_NO_QR, None, _login_notes(obs),
+                                 surface="browser", window_raised=page.window_raised)
+                return _view("waiting_scan", state, NEXT_WAITING, str(_qr_path(ctx.home)), _login_notes(obs),
+                             surface="browser", window_raised=page.window_raised)
             if obs.state == "blocked":
                 keep = False
                 _clear(ctx.home)

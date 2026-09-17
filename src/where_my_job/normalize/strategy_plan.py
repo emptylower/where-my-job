@@ -58,6 +58,12 @@ class Plan:
         """受控动作数 = 去重后的页数。"""
         return len(self.tasks)
 
+    def head(self, n: int) -> tuple["Plan", tuple[PlanTask, ...]]:
+        """按顺序切成"这次跑"和"这次不跑"两段。用于 --partial：当日额度不够时先跑能跑的，
+        剩下的照样登记为 planned 再标 skipped，run 记录里看得见少了什么。"""
+        n = max(0, min(n, len(self.tasks)))
+        return Plan(self.tasks[:n], self.cap, self.raw_upper_bound, self.name, self.pause), self.tasks[n:]
+
     def estimated_seconds(self) -> list[int]:
         """仅动作间等待的下界与上界（秒），不含页面加载耗时。"""
         gaps = max(self.actions - 1, 0)
@@ -66,16 +72,16 @@ class Plan:
 def _as_list(value) -> list:
     return value if isinstance(value, list) else [value]
 
-def _compile_search(i: int, s: dict) -> tuple[list[str], list[tuple[str, str]], list[tuple[str, list[str]]], int]:
+def _compile_search(i: int, s: dict, custom_cities: dict | None = None) -> tuple[list[str], list[tuple[str, str]], list[tuple[str, list[str]]], int]:
     keywords = list(dict.fromkeys(k.strip() for k in s["keywords"]))
     cities: list[tuple[str, str]] = []
     for j, c in enumerate(s["cities"]):
         try:
-            code = city_code(c)
+            code = city_code(c, custom_cities)
         except UnknownCode as e:
             raise PlanError(f"$.searches[{i}].cities[{j}]", str(e))
         if all(code != existing for existing, _ in cities):
-            cities.append((code, city_name(code)))
+            cities.append((code, city_name(code, custom_cities)))
     filters: list[tuple[str, list[str]]] = []
     for param in sorted((s.get("boss_filters") or {})):
         if param not in FILTER_TABLES:
@@ -97,8 +103,9 @@ def _compile_search(i: int, s: dict) -> tuple[list[str], list[tuple[str, str]], 
 
 def iter_tasks(strategy: dict) -> Iterator[PlanTask]:
     """懒生成（未去重）；编译错误在遇到对应搜索时抛出。"""
+    custom_cities = strategy.get("city_codes") or {}      # 策略自带的城市名→码映射，优先于内置便利名
     for i, s in enumerate(strategy["searches"]):
-        keywords, cities, filters, pages = _compile_search(i, s)
+        keywords, cities, filters, pages = _compile_search(i, s, custom_cities)
         params = [p for p, _ in filters]
         for kw in keywords:
             for code, name in cities:

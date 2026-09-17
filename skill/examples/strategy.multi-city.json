@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "多城多页合成配置",
+  "city_codes": {
+    "成都": "101270100",
+    "南京": "101190100"
+  },
+  "searches": [
+    {
+      "keywords": [
+        "AI产品经理",
+        "产品经理"
+      ],
+      "cities": [
+        "合肥",
+        "成都",
+        "南京",
+        "101280600"
+      ],
+      "pages": 5,
+      "boss_filters": {
+        "degree": [
+          "本科"
+        ],
+        "experience": [
+          "3-5年",
+          "1-3年"
+        ]
+      }
+    }
+  ],
+  "budget": {
+    "max_pages_per_run": 80,
+    "pause_between_actions_sec": [
+      12,
+      22
+    ]
+  }
+}

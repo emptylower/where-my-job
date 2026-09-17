@@ -27,7 +27,9 @@ def dry_run(lay: Layout, clock, strategy_path: str) -> dict:
     net = checked_network_layout(lay)
     view = PolicyView.from_state(policy_store.read_state_readonly(net.db_path, profile_id_for(net.browser_profile)))
     now = clock.now()
-    check_view(view, now, plan.actions)
+    check_view(view, now, 0)           # 只查时钟与冷却：额度不够不是停止条件，是要如实报给用户的数字
+    remaining = max(0, BUDGET_24H - actions_in_window(view, now))
+    today = min(plan.actions, remaining)
     return {
         "dry_run": True, "strategy": plan.name, "planned_actions": plan.actions,
         "tasks": [{"task_key": t.task_key, "keyword": t.keyword, "city": t.city, "city_code": t.city_code,
@@ -35,6 +37,9 @@ def dry_run(lay: Layout, clock, strategy_path: str) -> dict:
         "budget": {"remaining_24h": BUDGET_24H - actions_in_window(view, now), "budget_24h": BUDGET_24H,
                    "cooldown_until": view.cooldown_until},
         "estimated_seconds": plan.estimated_seconds(),
+        "coverage": {"fits_budget": plan.actions <= remaining, "planned_actions": plan.actions,
+                     "remaining_24h": remaining, "tasks_today": today,
+                     "tasks_deferred": plan.actions - today},
         "note": "服务端筛选已过滤的岗位不能靠本地恢复；面板显示本次采样条件",
     }
 
@@ -111,14 +116,20 @@ def _fail_and_skip(ctx, st, task_id: str, status: str, code: str, reason: str) -
         runs.finish_task(ctx.conn, ctx.clock, task_id, status=status, failure_code=code, failure_message=reason)
         runs.skip_planned(ctx.conn, ctx.clock, st.run_id, "stopped_after_failure")
 
-def _scan_body(ctx, gate: Gate, plan, st) -> dict:
+def _task_row(t):
+    return (t.task_key, {"keyword": t.keyword, "city_code": t.city_code, "filters": dict(t.filters),
+                         "filter_labels": dict(t.filter_labels), "page": t.page})
+
+def _scan_body(ctx, gate: Gate, plan, st, deferred: tuple = ()) -> dict:
     st.summary.update({k: 0 for k in _COUNTS})
     st.summary["ignored_reasons"] = {}
-    st.summary["planned"] = plan.actions
+    st.summary["planned"] = plan.actions + len(deferred)          # 报的是用户要的全量，不是本次能跑的
     with db.write_tx(ctx.conn):
-        ids = runs.add_planned_tasks(ctx.conn, ctx.clock, st.run_id, [
-            (t.task_key, {"keyword": t.keyword, "city_code": t.city_code, "filters": dict(t.filters),
-                          "filter_labels": dict(t.filter_labels), "page": t.page}) for t in plan.tasks])
+        ids = runs.add_planned_tasks(ctx.conn, ctx.clock, st.run_id,
+                                     [_task_row(t) for t in plan.tasks + deferred])
+        if deferred:                                              # 额度外的任务先登记再标跳过，run 记录里看得见
+            runs.skip_planned(ctx.conn, ctx.clock, st.run_id, "budget_24h_exhausted",
+                              [ids[t.task_key] for t in deferred])
     transport = make_transport(ctx)
     st.closers.append(transport.close)
     session = BrowserSession(transport)
@@ -174,23 +185,38 @@ def _scan_body(ctx, gate: Gate, plan, st) -> dict:
                 with db.write_tx(ctx.conn):
                     runs.skip_planned(ctx.conn, ctx.clock, st.run_id, reason, rest)
                 break
+    if deferred:
+        st.summary["deferred_actions"] = len(deferred)
+        st.summary["deferred_reason"] = "budget_24h"
     if st.summary["record_errors"]:
         raise Partial("PARTIAL_RESULT", public_message("PARTIAL_RESULT"))
     out = {k: st.summary[k] for k in _COUNTS}
     out["documents"] = st.summary.get("documents", [])
     out["ignored_reasons"] = dict(sorted(st.summary["ignored_reasons"].items()))
+    if deferred:
+        out["deferred_actions"] = len(deferred)
+        out["deferred_task_keys"] = [t.task_key for t in deferred]
+        out["deferred_reason"] = "budget_24h"
+        raise Partial("PARTIAL_RESULT", public_message("PARTIAL_RESULT"), data=out)
     return out
 
-def run(ctx, strategy_path: str) -> tuple[dict, str]:
+def run(ctx, strategy_path: str, *, partial: bool = False) -> tuple[dict, str]:
+    """partial=True：当日额度不够时先跑能跑的那部分，其余标 skipped 并以退出 4 交代。
+    用户已经在 --dry-run 的 coverage 上确认过范围之后才该带这个参数——不带时行为一字不变，
+    超额度仍然退出 3，不会替用户决定动用当天剩下的额度。"""
     require_online_enabled(ctx)
     blank_check(ctx)                   # 展开计划之前就确认浏览器可用，避免白占一次 list_page 动作
     strategy = load_json_file(strategy_path, "strategy")
     plan = expand_plan(strategy)
+    full_keys = [t.task_key for t in plan.tasks]
+    deferred: tuple = ()
     sleep, rng = make_pacing(ctx)
     gate = Gate(ctx, pause=plan.pause, sleep=sleep, rng=rng)
-    config = {"strategy": strategy, "task_keys": [t.task_key for t in plan.tasks], "probe": False}
+    if partial:
+        plan, deferred = plan.head(gate.ledger.remaining())
+    config = {"strategy": strategy, "task_keys": full_keys, "probe": False}
     out = network_run.execute(ctx, gate, actions=plan.actions, kind="scan", config=config,
-                              body=lambda st: _scan_body(ctx, gate, plan, st))
+                              body=lambda st: _scan_body(ctx, gate, plan, st, deferred))
     if out.primary is not None:
         raise out.primary
     return out.data, out.run_id
@@ -199,9 +225,11 @@ def register(sub, set_handler):
     p = sub.add_parser("scan", help="按策略受控采集列表页；--dry-run 只展开计划，不联网、不写任何状态")
     p.add_argument("--strategy", required=True)
     p.add_argument("--dry-run", action="store_true")
+    p.add_argument("--partial", action="store_true",
+                   help="当日额度不够跑完整个计划时，先跑能跑的那部分，其余标 skipped 并退出 4")
     def handle(ns, warnings):
         if ns.dry_run:
             from ..cli import main as cli_main
             return dry_run(Layout(home()), cli_main.make_clock(), ns.strategy)
-        return with_context(ns, warnings, lambda ctx: run(ctx, ns.strategy), write=True)
+        return with_context(ns, warnings, lambda ctx: run(ctx, ns.strategy, partial=ns.partial), write=True)
     set_handler(p, "scan", handle)

@@ -212,6 +212,18 @@ class CdpTransport:
         out, self._navigations = self._navigations, []
         return out
 
+    def activate(self) -> bool:
+        """把本标签页提到前台：Target.activateTarget 选中标签页，Page.bringToFront 把窗口拉起来。
+        扫码要靠用户看见浏览器窗口，不能指望"新建前台标签页"这种顺带行为——换个平台或 Chrome 版本就不成立。
+        置前失败不影响登录本身，返回 False 让调用方如实上报扫码面。"""
+        try:
+            self._result(self.conn.send("Target.activateTarget", {"targetId": self.target_id}, timeout=5),
+                         "Target.activateTarget")
+            self._result(self.conn.send("Page.bringToFront", {}, self.session_id, timeout=5), "Page.bringToFront")
+            return True
+        except Exception:                               # noqa: BLE001 — 置前是尽力而为
+            return False
+
     def navigate(self, url: str) -> dict:
         self.set_document_guard(True)                   # 本工具自己的导航一律受拦截保护，与调用方是谁无关
         reply = self.conn.send("Page.navigate", {"url": url}, self.session_id, timeout=30)

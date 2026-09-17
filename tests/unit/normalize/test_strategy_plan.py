@@ -72,3 +72,16 @@ def test_plan_exposes_scan_contract_fields():
     assert t1.city == "合肥" and t1.task_key == "AI产品经理|101220100|experience=104|p1"
     assert t2.task_key.endswith("|p2") and t1.task_key != t2.task_key
     assert len({t.task_key for t in plan.tasks}) == plan.actions
+
+
+def test_strategy_carries_its_own_city_codes():
+    """城市名→码的映射写在策略文件里：validate strategy 走的是无 context 的纯路径，
+    数据目录里的配置到不了这儿；映射跟着用它的策略走，才能被同一份 schema 校验。"""
+    from where_my_job.normalize.strategy_plan import expand_plan
+    s = {"schema_version": 1, "name": "t", "city_codes": {"成都": "101270100"},
+         "searches": [{"keywords": ["AI产品经理"], "cities": ["成都", "101190100", "合肥"], "pages": 2}],
+         "budget": {"pause_between_actions_sec": [12, 20]}}
+    plan = expand_plan(s)
+    assert plan.actions == 6
+    assert [t.city_code for t in plan.tasks][::2] == ["101270100", "101190100", "101220100"]
+    assert [t.city_name for t in plan.tasks][::2] == ["成都", "101190100", "合肥"]

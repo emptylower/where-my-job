@@ -119,7 +119,7 @@ description: 本地求职情报工具的 agent 入口。用户提到找工作、
 
 ### 场景：首次使用
 
-目标是尽快让用户看到自己的真实岗位。顺序是：说明边界 → 扫码登录 → 建画像 → 第一页采集 → 面板。合成 demo 只在用户想先看效果，或当前版本不能联网时运行。
+目标是尽快让用户看到自己的真实岗位。顺序是：说明边界 → 扫码登录 → 建画像 → 按用户要的范围采集 → 面板。合成 demo 只在用户想先看效果，或当前版本不能联网时运行。
 
 | 步 | 做什么 | 看什么 |
 |---|---|---|
@@ -127,22 +127,25 @@ description: 本地求职情报工具的 agent 入口。用户提到找工作、
 | 2 | 看 `where-my-job version` 的 `data.online_adapter_default`：`enabled` 时用选择题问"先登录 BOSS 直聘（推荐）/ 先看合成演示"；`disabled` 时说明当前版本不能联网，改为导入用户已有的岗位文件，或运行合成 demo | 用户的选择 |
 | 3 | 用户选登录：按下面「扫码登录」完成 | `data.login.status` 为 `confirmed` |
 | 4 | 建画像：按 `skill/references/interview.md`，先问有没有简历文件；有就读简历起草，没有就用选择题问；逐项确认后写 profile/scoring/strategy 候选文件 → `where-my-job validate profile F`、`where-my-job validate scoring F`、`where-my-job validate strategy F` | 三个都退出 0；对用户只复述画像要点 |
-| 5 | 首次采集：用一句话告诉用户要搜哪个城市的哪类岗位、只看第一页 → 用户同意 → `where-my-job scan --strategy F --dry-run` → `where-my-job scan --strategy F` | 退出 0/4 继续，3 停止 |
+| 5 | 首次采集：问用户想搜哪些城市、哪类岗位、大概看多少页（用户没主意时给一个小范围起步，并说明随时可以扩大，代价是时间和当日额度）→ 按下面「采集范围」执行 | 退出 0/4 继续，3 停止 |
 | 6 | `where-my-job match` → `where-my-job panel --open` | 告诉用户面板已打开，用一两句话说排在前面的岗位为什么靠前 |
 
 真实使用不要沿用 demo 的临时数据目录：demo 的 `WMJ_HOME` 只在运行 demo 的那个 shell 里设置；之后的命令在不带该变量的 shell 里运行，让 CLI 使用默认数据目录或用户明确选择的专用目录。
 
 #### 扫码登录
 
-登录页的二维码大约每 30 秒换一张（页面自己换，不是到期失效），你把二维码抄进回复来不及（实测要 25 秒以上）。二维码由命令直接画在它自己的输出里（stderr），用户在 agent 界面按 ctrl+o 展开这条命令的输出就能扫；你不要抄。`data.login.notes` 里出现 `expiry_marker:` 时，说明页面明确写着二维码失效、本工具点了刷新；没有这一项就是页面自行换码。
+**扫码面是专用 Chrome 窗口，不是命令输出。** `login start` 会打开登录页并把那个窗口提到前台，二维码就在窗口里；命令输出里的字符画只是**终端界面的备用显示**。很多 agent 是 GUI 或 TUI，用户根本没有"展开命令输出"这回事——默认让用户去扫窗口，永远成立。
 
-1. **第一次登录前先验一次显示**：运行 `where-my-job login test-qr`（不联网、不计动作），让用户按 ctrl+o 展开输出，用手机相机扫那张测试码。扫得出来就继续；扫不出来再运行 `where-my-job login test-qr --light-terminal`（浅色背景终端）。哪一种能扫，就把 `qr_terminal_background` 写进数据目录的 `settings.json`（`"light"` 或 `"dark"`，按铁律 2 先 `where-my-job validate settings F` 再放进数据目录），之后 `login start`、`login status` 不必再带参数。
-2. 登录前告诉用户两件事，并等用户回复准备好：请先打开 BOSS 直聘 App 的扫一扫；二维码会出现在命令输出里，会经过你的运行环境、可能进入模型提供商的处理流程。用户不接受时改用 `where-my-job init --browser`，请用户在弹出的专用 Chrome 里自己登录；用户登录完成后先运行 `where-my-job browser stop` 再运行 `where-my-job init --browser`，把浏览器恢复成只有空白页的状态，然后才能开始采集（登录状态保存在专用 profile 里，不会因此丢失）。
-3. 运行 `where-my-job login start`。`data.login.status` 为 `waiting_scan` 时，只回复一句：按 ctrl+o 展开上面这条命令的输出扫码（也可以扫专用 Chrome 窗口里的二维码），然后在手机上点确认。
-4. 马上运行 `where-my-job login status --wait 30`。结果为 `waiting_scan` 时直接再运行，不重复说话；`qr_updated` 表示旧二维码已换新、新的已画在这条命令的输出里，只提醒一句扫新的；直到 `confirmed`，说一句"登录好了"。用户按过一次 ctrl+o 之后，后面的命令输出会一直展开显示。
-5. `qr_not_found`：请用户直接扫专用 Chrome 窗口里的二维码，继续运行 `where-my-job login status --wait 30`。
-6. 不要只给用户图片路径，也不要用读图工具"展示"二维码：读图工具只让你看到图片，用户看不到。
-7. 退出 3 立即停止，用一句话说明原因；登录超时就说"这次登录超时了"，问用户要不要重来；用户放弃时运行 `where-my-job login cancel`。你不代填账号密码。
+看 `data.login` 两个字段决定怎么说：`surface` 为 `browser` 表示登录页确实开在专用 Chrome 窗口里；`window_raised` 为 `false` 表示本工具没能把窗口提到前台，这时多提一句请用户自己切过去。二维码大约每 30 秒换一张（页面自己换，不是到期失效），你把它抄进回复来不及（实测要 25 秒以上），也不要抄。`data.login.notes` 里出现 `expiry_marker:` 时，说明页面明确写着二维码失效、本工具点了刷新；没有这一项就是页面自行换码。
+
+1. 登录前告诉用户两件事，并等用户回复准备好：请先打开 BOSS 直聘 App 的扫一扫；二维码会出现在专用 Chrome 窗口里，同时也会画在命令输出里、会经过你的运行环境、可能进入模型提供商的处理流程。用户不接受经过你的环境时，改用 `where-my-job init --browser`，请用户在弹出的专用 Chrome 里自己登录；用户登录完成后先运行 `where-my-job browser stop` 再运行 `where-my-job init --browser`，把浏览器恢复成只有空白页的状态，然后才能开始采集（登录状态保存在专用 profile 里，不会因此丢失）。
+2. 运行 `where-my-job login start`。`data.login.status` 为 `waiting_scan` 时，只回复一句：扫刚弹出来的那个 Chrome 窗口里的二维码，然后在手机上点确认。
+3. 马上运行 `where-my-job login status --wait 30`。结果为 `waiting_scan` 时直接再运行，不重复说话；`qr_updated` 表示旧二维码已换新，只提醒一句扫新的；直到 `confirmed`，说一句"登录好了"。
+4. 用户说看不到二维码时运行 `where-my-job login status --wait 0 --show-qr`：它会把窗口重新提到前台并重画一次字符画。普通轮询不会抢焦点。
+5. `qr_not_found`：本工具没识别出二维码，但登录页就开在那个窗口里——请用户直接扫窗口，继续运行 `where-my-job login status --wait 30`。
+6. **终端界面（例如 Claude Code）可选**：想让用户在命令输出里扫，先运行 `where-my-job login test-qr`（不联网、不计动作），让用户按 ctrl+o 展开输出用手机相机扫那张测试码；扫不出来换 `where-my-job login test-qr --light-terminal`（浅色背景终端）。哪一种能扫就把 `qr_terminal_background` 写进数据目录的 `settings.json`（`"light"` 或 `"dark"`，按铁律 2 先 `where-my-job validate settings F` 再放进数据目录）。**这一步不是登录的前置条件**，不做也能正常登录。
+7. 不要只给用户图片路径，也不要用读图工具"展示"二维码：读图工具只让你看到图片，用户看不到。
+8. 退出 3 立即停止，用一句话说明原因；登录超时就说"这次登录超时了"，问用户要不要重来；用户放弃时运行 `where-my-job login cancel`。你不代填账号密码。
 
 #### 合成 demo 命令
 
@@ -166,9 +169,25 @@ $WMJ panel --open
 printf '合成演示数据目录：%s\n面板：%s/panel/latest.html\n' "$WMJ_HOME" "$WMJ_HOME"
 ```
 
+#### 采集范围
+
+用户说了范围就按范围做。不要替用户缩小，也不要因为"可能花得多"就自作主张只跑一页——那是用户的钱和用户的时间，不是你的判断。
+
+| 规则 | 做什么 |
+|---|---|
+| A | 用户给了范围（哪些城市、哪些岗位、多少页），就照着写 strategy。**不得自行缩小。** 用户没给范围才问。 |
+| B | 写完先 `where-my-job scan --strategy F --dry-run`（不联网、不写任何状态），读 `data.coverage`。 |
+| C | `coverage.fits_budget` 为 `true`：用一句话告诉用户"这次 N 个动作、大约 X–Y 分钟"，然后直接跑 `where-my-job scan --strategy F`。**不要再问第二次。** |
+| D | `coverage.fits_budget` 为 `false`：**只问一次**。给出 `planned_actions`、`remaining_24h`、`tasks_today`、`tasks_deferred` 和预计耗时，说明今天只能跑完前 `tasks_today` 个任务、其余要等额度恢复。用户确认后运行 `where-my-job scan --strategy F --partial`，**立即执行，不再劝阻、不再缩小范围、不再重复风险提示**。 |
+| E | 跑完按 `data` 如实报告：`--partial` 跑完是退出 4，`data.deferred_actions` 和 `data.deferred_task_keys` 说明欠了哪些。退出 4 也要明说哪些搜索没跑完、哪些任务被标 skipped。 |
+
+不带 `--partial` 时行为不变：计划超过当日额度直接退出 3（`BUDGET_EXHAUSTED`），不会替用户动用当天剩下的额度。`--partial` 只在用户看过 `coverage` 并确认之后才用。
+
+城市不是白名单。内置了合肥、上海、北京、深圳、广州、杭州、武汉七个便利名；其余城市**直接写平台城市码**（形如 `101270100`），或在策略文件的 `city_codes` 里给出名字到码的映射再按名字用。码的来源由用户提供，本工具不猜、不编。
+
 ### 场景：日常扫描
 
-`where-my-job status` → `where-my-job scan --strategy F --dry-run` → 用户已授权范围内 `where-my-job scan --strategy F` → 按 `data` 里的计划与完成任务报告覆盖 → `where-my-job match` → `where-my-job panel`。scan 或 probe 退出 2 且 `errors[0].code=UNAUTHENTICATED` 时，先按「扫码登录」完成登录再继续——这包括"页面自己切到了登录界面"这种情形，`data.documents` 里会有一条 `landing:` 指出落点。如果有未完成的扫码登录（`LOGIN_NOT_STARTED` 之外，scan 因专用浏览器里还开着登录页而拒绝），先 `where-my-job login status --wait 30` 完成它，或 `where-my-job login cancel`；如果拒绝原因是 `BROWSER_NOT_BLANK`，那是用户自己在专用浏览器里开着页面，按退出码 2 那一行的处置办。部分覆盖（退出 4）要明说哪些搜索没跑完、哪些任务被标为 skipped。
+`where-my-job status` → 按上面「采集范围」的 A–E 执行（`--dry-run` 看 `coverage` → 跑 `scan`）→ 按 `data` 里的计划与完成任务报告覆盖 → `where-my-job match` → `where-my-job panel`。scan 或 probe 退出 2 且 `errors[0].code=UNAUTHENTICATED` 时，先按「扫码登录」完成登录再继续——这包括"页面自己切到了登录界面"这种情形，`data.documents` 里会有一条 `landing:` 指出落点。如果有未完成的扫码登录（`LOGIN_NOT_STARTED` 之外，scan 因专用浏览器里还开着登录页而拒绝），先 `where-my-job login status --wait 30` 完成它，或 `where-my-job login cancel`；如果拒绝原因是 `BROWSER_NOT_BLANK`，那是用户自己在专用浏览器里开着页面，按退出码 2 那一行的处置办。部分覆盖（退出 4）要明说哪些搜索没跑完、哪些任务被标为 skipped。
 
 ### 场景：点名深挖
 

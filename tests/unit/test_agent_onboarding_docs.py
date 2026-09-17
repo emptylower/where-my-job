@@ -23,15 +23,31 @@ def test_skill_first_use_logs_in_before_building_profile_and_demo_is_optional():
     assert first.index("扫码登录") < first.index("interview.md") < first.index("where-my-job scan --strategy F --dry-run")
     assert "data.online_adapter_default" in first and "合成 demo 只在" in first
 
-def test_skill_login_tells_user_to_expand_with_ctrl_o_and_checks_the_drawing_first():
+def test_skill_login_puts_the_browser_window_first_and_makes_the_terminal_check_optional():
+    """扫码面默认是专用 Chrome 窗口：GUI / TUI 前端没有"展开命令输出"这回事，
+    终端字符画只能是备用。终端显示自检因此不能再当登录的前置步骤。"""
     t = _read("SKILL.md")
     login = t.split("#### 扫码登录", 1)[1].split("\n####", 1)[0]
     for s in ("`where-my-job login test-qr`", "`where-my-job login start`", "`where-my-job login status --wait 30`",
               "`where-my-job login cancel`", "ctrl+o", "qr_terminal_background", "--light-terminal", "30 秒",
-              "读图工具", "init --browser"):
+              "读图工具", "init --browser", "--show-qr"):
         assert s in login, s
-    assert login.index("test-qr") < login.index("`where-my-job login start`")
+    assert "专用 Chrome 窗口" in login and "备用" in login
+    assert "`surface`" in login and "`window_raised`" in login          # 给 agent 的机器可读依据
+    assert login.index("`where-my-job login start`") < login.index("test-qr")   # 自检降级为可选，排在登录之后
+    assert "不是登录的前置条件" in login
     assert "不要抄" in login and "data.login.qr_png" not in login
+
+def test_skill_scan_scope_forbids_shrinking_the_user_request():
+    """"只看第一页"曾经写在首次使用里，示例也只有单页样板——偷懒是写在文件里的。
+    现在的规则是：按用户要的范围铺满；超额度只问一次；确认后立即执行，不再推辞。"""
+    t = _read("SKILL.md")
+    scope = t.split("#### 采集范围", 1)[1].split("\n### ", 1)[0]
+    for s in ("不得自行缩小", "coverage.fits_budget", "planned_actions", "remaining_24h", "tasks_today",
+              "tasks_deferred", "--partial", "只问一次", "不再劝阻", "BUDGET_EXHAUSTED"):
+        assert s in scope, s
+    assert "城市不是白名单" in scope and "101270100" in scope and "city_codes" in scope
+    assert "只看第一页" not in t and "第一页采集" not in t
 
 def test_skill_tells_agent_how_to_talk_to_users():
     t = _read("SKILL.md")

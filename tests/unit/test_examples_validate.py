@@ -9,12 +9,13 @@ JOB = "boss:SYN0001aaaa"
 SIMPLE = {
     "profile.synthetic-qc-to-aipm.json": "profile",
     "strategy.first-page.json": "strategy",
+    "strategy.multi-city.json": "strategy",        # 多城多页样板：只有单页样板可抄，agent 就只会抄单页
     "scoring.minimal-aipm.json": "scoring",
     "panel.default.json": "panel",
     "stream.synthetic-interviews.json": "stream",
 }
 
-def test_exactly_six_examples_exist():
+def test_exactly_seven_examples_exist():
     assert sorted(p.name for p in EX.glob("*.json")) == sorted([*SIMPLE, "report.synthetic.json"])
 
 @pytest.mark.parametrize("name,kind", sorted(SIMPLE.items()))
