@@ -112,10 +112,25 @@ description: 本地求职情报工具的 agent 入口。用户提到找工作、
 |---|---|---|
 | 1 | `uv --version`；没有 uv 时先征得用户同意，再用 `brew install uv` 或 uv 官方安装脚本安装 | 输出版本号 |
 | 2 | `~/where-my-job` 不存在时，按用户给的仓库地址克隆到 `~/where-my-job`；已存在则直接使用，不擅自更新 | 目录内有 `SKILL.md` 与 `pyproject.toml` |
-| 3 | 用户态：`uv tool install ~/where-my-job`（已装过用 `uv tool install --reinstall ~/where-my-job`）；找不到命令时运行 `uv tool update-shell`，并在当前会话把 uv 的 bin 目录加入 PATH。开发态或不想动已安装版本时：不要 `uv tool install`，改用 `uv run --project ~/where-my-job where-my-job ...`，并把下文所有 `where-my-job` 换成这一串 | `where-my-job version` 输出 `data.version` 与 `data.online_adapter_default`；两种形态都要确认版本来自你正在用的那份仓库 |
+| 3 | 用户态：`uv tool install ~/where-my-job`（已装过用 `uv tool install --reinstall --refresh ~/where-my-job`，**`--refresh` 不能省**，见下）；找不到命令时运行 `uv tool update-shell`，并在当前会话把 uv 的 bin 目录加入 PATH。开发态或不想动已安装版本时：不要 `uv tool install`，改用 `uv run --project ~/where-my-job where-my-job ...`，并把下文所有 `where-my-job` 换成这一串 | `where-my-job version` 输出 `data.version`、`data.build_id` 与 `data.online_adapter_default`；按下面「确认装的是哪份代码」核对 |
 | 4 | 链接 skill，目标已存在就跳过：Claude Code 运行 `ln -s ~/where-my-job ~/.claude/skills/where-my-job`；Kimi Code CLI 先 `mkdir -p ~/.kimi-code/skills`，再 `ln -s ~/where-my-job ~/.kimi-code/skills/where-my-job` | 之后的新会话可以找到本 Skill |
 | 5 | `where-my-job init` | 退出 0；记下 `data.home` |
 | 6 | 只在用户决定联网时检查 `/Applications/Google Chrome.app` 是否存在 | 不存在就告诉用户需要先安装 Chrome，不代装 |
+
+#### 确认装的是哪份代码
+
+版本号常年是 `0.1.0`，新旧构建长得一模一样；而 `uv tool install` **会复用构建缓存**，`--reinstall` 也照样复用——它重装包，但不重建。结果是命令跑着旧代码、仓库里却是新代码，报错信息和文档对不上，很难看出来。
+
+核对办法是比 `build_id`（包内源码的短哈希，装在哪儿都一样）：
+
+```
+where-my-job version                                     # 装好的那份
+uv run --project ~/where-my-job where-my-job version     # 仓库里的那份
+```
+
+两个 `data.build_id` 一致就是同一份代码。不一致，或者装好的那份**根本没有 `build_id` 字段**（那是更早的旧构建），就运行 `uv tool install --reinstall --refresh ~/where-my-job` 重装，然后再比一次。
+
+命令行为与文档对不上时先比这个，不要先怀疑文档写错。
 
 ### 场景：首次使用
 
@@ -183,7 +198,11 @@ printf '合成演示数据目录：%s\n面板：%s/panel/latest.html\n' "$WMJ_HO
 
 不带 `--partial` 时行为不变：计划超过当日额度直接退出 3（`BUDGET_EXHAUSTED`），不会替用户动用当天剩下的额度。`--partial` 只在用户看过 `coverage` 并确认之后才用。
 
-城市不是白名单。内置了合肥、上海、北京、深圳、广州、杭州、武汉七个便利名；其余城市**直接写平台城市码**（形如 `101270100`），或在策略文件的 `city_codes` 里给出名字到码的映射再按名字用。码的来源由用户提供，本工具不猜、不编。
+城市不是白名单。内置了合肥、上海、北京、深圳、广州、杭州、武汉七个便利名；其余城市**直接写平台城市码**（形如 `101270100`），或在策略文件的 `city_codes` 里给出名字到码的映射再按名字用。
+
+**内置名之外的城市码由你查，不要让用户去查。** 用你自己的联网检索能力找（不要用本工具的联网入口，也不要写脚本去访问平台），**至少两个来源对上才用**，平台自己的网址结构最可信。查到后写进 `city_codes`，并在告诉用户范围时顺带说一句"南京 101190100、苏州 101190400（已交叉核对）"——一句话，不要展开讨论。只有确实对不上时才问用户。
+
+**绝不为了跑起来先填一个差不多的码。** 城市码错了不会报错，只会**静默采集另一个城市**，而且你事后看数据也分不出来。宁可停下来问，也不要填个没核对过的。
 
 ### 场景：日常扫描
 

@@ -58,8 +58,9 @@ def city_code(name_or_code: str, extra: Mapping[str, str] | None = None) -> str:
         return CITY_CODES[s]
     if CITY_CODE_RE.fullmatch(s):
         return s
-    raise UnknownCode(f"未知城市名: {s}（请直接写城市码，形如 101270100；"
-                      f"或在策略的 city_codes 里给出 \"{s}\" 对应的码。内置便利名：{'、'.join(CITY_CODES)}）")
+    raise UnknownCode(f"未知城市名: {s}（查到该城市的平台城市码后写进策略的 city_codes，"
+                      f"或在 cities 里直接写码，形如 101270100；码须交叉核对，填错会静默采集到别的城市。"
+                      f"内置便利名：{'、'.join(CITY_CODES)}）")
 
 def city_name(code: str, extra: Mapping[str, str] | None = None) -> str:
     """反查显示名。查不到就用码本身当显示名——我们不给平台的码编名字。"""

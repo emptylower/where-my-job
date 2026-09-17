@@ -49,6 +49,17 @@ def test_skill_scan_scope_forbids_shrinking_the_user_request():
     assert "城市不是白名单" in scope and "101270100" in scope and "city_codes" in scope
     assert "只看第一页" not in t and "第一页采集" not in t
 
+def test_skill_makes_the_agent_resolve_city_codes_not_the_user():
+    """"码由用户提供"曾经写在这里，agent 于是卡住去问人。CLI 不内置全国表（随包固化的错值查不出来）
+    和 agent 自己逐次检索并交叉核对，是两件事——后者当场可核、来源可说。"""
+    t = _read("SKILL.md")
+    scope = t.split("#### 采集范围", 1)[1].split("\n### ", 1)[0]
+    assert "不要让用户去查" in scope and "至少两个来源" in scope
+    assert "静默采集另一个城市" in scope                      # 为什么必须核对，而不是"差不多就行"
+    assert "码的来源由用户提供" not in t and "码由用户提供" not in t
+    ref = _read("skill/references/strategy-schema.md")
+    assert "不要转手让用户去查" in ref and "这条约束管的是 CLI，不是 agent" in ref
+
 def test_skill_tells_agent_how_to_talk_to_users():
     t = _read("SKILL.md")
     talk = t.split("### 对用户怎么说", 1)[1].split("\n## ", 1)[0]
@@ -109,3 +120,17 @@ def test_checklist_records_drawing_and_document_diagnostics():
     assert "字符画" in c and "--light-terminal" in c and "ctrl+o" in c
     assert "refused_subframes" in c and "data.documents" in c
     assert "开场 prompt" in a and "where-my-job login start" in a and "展示二维码图片" not in a
+
+
+def test_version_exposes_a_build_fingerprint_and_skill_says_how_to_compare_it():
+    """`uv tool install` 复用构建缓存，`--reinstall` 也照样复用；版本号又常年 0.1.0，
+    于是"确认版本来自你正在用的那份仓库"这条指令原本没有任何可比的东西。"""
+    from where_my_job.service.version_cmd import build_id
+    bid = build_id()
+    assert len(bid) == 12 and all(c in "0123456789abcdef" for c in bid)
+    assert bid == build_id()                                   # 同一份代码稳定复现
+    t = _read("SKILL.md")
+    how = t.split("#### 确认装的是哪份代码", 1)[1].split("\n### ", 1)[0]
+    for s in ("build_id", "--reinstall --refresh", "uv run --project ~/where-my-job where-my-job version"):
+        assert s in how, s
+    assert "--reinstall` 也照样复用" in how                      # 说清楚为什么 --refresh 不能省
