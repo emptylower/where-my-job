@@ -73,3 +73,41 @@ def test_timeline_marker_empty_without_rows():
     assert 'data-tab-target="timeline"' not in html and '<section data-tab="timeline"' not in html
     dom = Surface(); dom.feed(html)
     assert sum(tag == "script" for tag, _ in dom.tags) == 1
+
+def test_pager_and_empty_state_markup():
+    """分页与空态是固定脚本唯一能改的结构：模板必须预置页码按钮池和空态行，脚本从不新建元素。"""
+    spec = PanelSpec.from_dict({"schema_version": 1, "columns": ["title", "score", "tier"]})
+    rows = [{"title": f"合成岗位{i}", "score": float(i), "tier": "B", "job_id": f"boss:{i}"} for i in range(3)]
+    html = render_html(spec, rows, _meta(groups={"main": {"total": 3, "shown": 3, "truncated": False},
+                                                 "excluded": {"rows": [], "total": 0, "shown": 0, "truncated": False},
+                                                 "unknown": {"rows": [], "total": 0, "shown": 0, "truncated": False}}))
+    assert html.count("data-page-btn") >= 5 and 'data-page-step="-1"' in html and 'data-page-step="1"' in html
+    assert "select data-page-size" in html and "共 <b>3</b> 条记录" in html
+    assert '<tbody data-empty hidden>' in html and 'colspan="3"' in html      # colspan 跟随列数
+    dom = Surface(); dom.feed(html)
+    assert sum(tag == "script" for tag, _ in dom.tags) == 1
+
+def test_summary_card_reports_group_totals():
+    spec = PanelSpec.from_dict({"schema_version": 1, "columns": ["title"]})
+    rows = [{"title": "岗位", "job_id": "boss:x"}]
+    html = render_html(spec, rows, _meta(groups={"main": {"total": 1, "shown": 1, "truncated": False},
+                                                 "excluded": {"rows": [], "total": 4, "shown": 4, "truncated": False},
+                                                 "unknown": {"rows": [], "total": 2, "shown": 2, "truncated": False}}))
+    assert "主列表岗位" in html and '<div class="statnum">1</div>' in html and "已排除 4 · 待核实 2" in html
+
+def test_bar_chart_caps_bars_and_aggregates_the_rest():
+    """城市这类维度可能有几十个取值；卡片只列前 8 项，其余并成一行，总数不丢。"""
+    spec = PanelSpec.from_dict({"schema_version": 1, "columns": ["title"], "charts": [{"type": "bar", "by": "city"}]})
+    rows = [{"title": f"岗位{i}", "job_id": f"boss:{i}", "city": f"城市{i % 12}"} for i in range(24)]
+    html = render_html(spec, rows, _meta())
+    assert "其它 4 项" in html and html.count('class="bar"') == 9
+    assert '<i style="width:100%"></i>' in html
+
+def test_truncated_and_unmatched_only_shown_when_real():
+    spec = PanelSpec.from_dict({"schema_version": 1, "columns": ["title"]})
+    clean = render_html(spec, [], _meta())
+    assert "已截断" not in clean and "未匹配" not in clean
+    noisy = render_html(spec, [], _meta(unmatched=3, groups={"main": {"total": 9, "shown": 2, "truncated": True},
+                                                             "excluded": {"rows": [], "total": 0, "shown": 0, "truncated": False},
+                                                             "unknown": {"rows": [], "total": 0, "shown": 0, "truncated": False}}))
+    assert "已截断" in noisy and "未匹配" in noisy and noisy.count('class="m hot"') == 2

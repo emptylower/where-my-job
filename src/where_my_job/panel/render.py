@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from importlib import resources
 from urllib.parse import urlsplit, urlunsplit
 from ..config.columns import V_JOBS_COLUMNS
+from .icons import icon
 from .timeline import render_section, TIMELINE_TAB_BUTTON
 
 COLUMN_LABELS = {
@@ -22,6 +23,9 @@ COLUMN_LABELS = {
 }
 CHART_LABELS = {"dir": "方向分布", "tier": "档位分布", "city": "城市分布", "exp": "经验要求", "degree": "学历要求",
                 "report_state": "报告状态", "application_state": "投递状态"}
+CHART_ICONS = {"dir": "target", "tier": "bars", "city": "layers", "exp": "clock", "degree": "cap",
+               "report_state": "list", "application_state": "trend"}
+CHART_MAX_BARS = 8                                     # 城市这类维度可能有几十个取值，卡片只列前几项，其余并成一行
 FILTER_COLUMNS = ("dir", "tier", "city", "exp", "degree", "match_state", "report_state", "application_state")
 EXCLUDED_COLUMNS = ("title", "company_name", "city", "exp", "degree", "dir", "exclusion_reasons_json")
 UNKNOWN_COLUMNS = ("title", "company_name", "city", "match_state", "unknowns_json")
@@ -135,6 +139,14 @@ def _cells(cols, r: dict) -> str:
             tds.append(f"<td{cls}{title}>{inner}</td>")
     return "".join(tds)
 
+def _card(icon_name: str, title: str, body: str, cls: str = "") -> str:
+    return (f'<div class="card{cls}"><span class="cardicon">{icon(icon_name)}</span>'
+            f'<div class="cardbody"><h2>{esc_text(title)}</h2>{body}</div></div>')
+
+def _summary_card(total: int, excluded: int, unknown: int) -> str:
+    sub = f"已排除 {excluded} · 待核实 {unknown}"
+    return _card("case", "主列表岗位", f'<div class="statnum">{total}</div><p class="statsub">{esc_text(sub)}</p>', cls=" stat")
+
 def _bar_chart(by: str, rows: list[dict]) -> str:
     counts: dict[str, int] = {}
     for r in rows:
@@ -142,11 +154,15 @@ def _bar_chart(by: str, rows: list[dict]) -> str:
         counts[k] = counts.get(k, 0) + 1
     if not counts:
         return ""
-    mx = max(counts.values())
     items = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))
-    bars = "".join(f'<div class="bar"><span style="width:96px;display:inline-block">{esc_text(k)}</span>'
-                   f'<i style="width:{int(140 * n / mx)}px"></i><span>{n}</span></div>' for k, n in items)
-    return f'<div class="chart"><h2>{esc_text(CHART_LABELS.get(by, by))}</h2>{bars}</div>'
+    if len(items) > CHART_MAX_BARS:
+        rest = items[CHART_MAX_BARS:]
+        items = items[:CHART_MAX_BARS] + [(f"其它 {len(rest)} 项", sum(n for _, n in rest))]
+    mx = max(n for _, n in items)
+    bars = "".join(f'<div class="bar"><span class="barlabel" title="{esc_attr(k)}">{esc_text(k)}</span>'
+                   f'<span class="track"><i style="width:{n / mx * 100:.4g}%"></i></span>'
+                   f'<b class="barnum">{n}</b></div>' for k, n in items)
+    return _card(CHART_ICONS.get(by, "bars"), CHART_LABELS.get(by, by), f'<div class="bars">{bars}</div>')
 
 def _group_table(group: dict, cols, note: str) -> str:
     out = [f'<p class="note">{esc_text(note)}</p>']
@@ -158,7 +174,33 @@ def _group_table(group: dict, cols, note: str) -> str:
         return "".join(out)
     head = "".join(f"<th>{esc_text(COLUMN_LABELS.get(c, c))}</th>" for c in cols)
     body = "".join(f"<tr>{_cells(cols, r)}</tr>" for r in rows)
-    out.append(f"<table><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table>")
+    out.append(f'<div class="table-wrap"><table><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>')
+    return "".join(out)
+
+_AS_OF_TRIM = re.compile(r"^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})\.\d+(Z)$")
+
+def _subtitle(as_of) -> str:
+    """as_of 带微秒，太长；页头显示到秒，完整值留在 title 里，不丢精度。"""
+    raw = "" if as_of is None else str(as_of)
+    m = _AS_OF_TRIM.match(raw)
+    shown = m.group(1) + m.group(2) if m else raw
+    return icon("clock") + "数据时间 <b title=\"" + esc_attr(raw) + '">' + esc_text(shown) + "</b>"
+
+def _meta_chips(meta: dict, main_g: dict) -> str:
+    """页头右侧的元信息：常量项常驻，异常项（未匹配、截断）只在真的发生时出现并标黄。"""
+    items = [("layers", "输入选择", meta.get("input_selection") or "latest", False),
+             ("cap", "校园岗位", meta.get("campus"), False),
+             ("eye", "主列表", f"{main_g.get('shown')} / {main_g.get('total')}", False),
+             ("hash", "匹配批次", meta.get("match_run_id") or "尚未匹配", False)]
+    if meta.get("unmatched", 0):
+        items.append(("alert", "未匹配", meta.get("unmatched"), True))
+    if main_g.get("truncated"):
+        items.append(("alert", "已截断", f"{main_g.get('shown')} / {main_g.get('total')}", True))
+    out = []
+    for ic, label, value, hot in items:
+        cls = "m hot" if hot else "m"
+        full = esc_attr(f"{label}：{value}")
+        out.append(f'<span class="{cls}" title="{full}">{icon(ic)}{esc_text(label)} <b>{esc_text(value)}</b></span>')
     return "".join(out)
 
 def render_html(spec: PanelSpec, rows: list[dict], meta: dict, *, timeline_rows: list[dict] | None = None,
@@ -182,30 +224,32 @@ def render_html(spec: PanelSpec, rows: list[dict], meta: dict, *, timeline_rows:
         if not vals:
             continue
         opts = "".join(f'<option value="{esc_attr(v)}">{esc_text(v)}</option>' for v in vals)
-        filters.append(f'<label>{esc_text(COLUMN_LABELS.get(fc, fc))} <select data-filter="{esc_attr(fc)}"><option value="">全部</option>{opts}</select></label>')
-    filters.append('<label>搜索 <input data-search type="search" placeholder="岗位/公司/城市/技能"></label>')
-    filters.append('<label>可见 <b data-visible-count>0</b> / ' + esc_text(len(rows)) + "</label>")
-    charts = "".join(_bar_chart(c["by"], rows) for c in spec.charts if c.get("type") == "bar")
+        filters.append(f'<label>{esc_text(COLUMN_LABELS.get(fc, fc))} <span class="sel"><select data-filter="{esc_attr(fc)}">'
+                       f'<option value="">全部</option>{opts}</select></span></label>')
+    filters.append('<span class="fright"><span class="searchbox">' + icon("search")
+                   + '<input data-search type="search" placeholder="岗位 / 公司 / 城市 / 技能" aria-label="搜索"></span>'
+                   + '<span class="vis">可见 <b data-visible-count>0</b> / ' + esc_text(len(rows)) + "</span></span>")
     groups = meta.get("groups") or {}
     main_g = groups.get("main") or {"total": len(rows), "shown": len(rows), "truncated": False}
     empty = {"rows": [], "total": 0, "shown": 0, "truncated": False}
     exc_g = groups.get("excluded") or empty
     unk_g = groups.get("unknown") or empty
-    meta_html = "".join(f"<span>{esc_text(k)}：{esc_text(v)}</span>" for k, v in (
-        ("as_of", meta.get("as_of")), ("匹配批次", meta.get("match_run_id") or "尚未匹配"),
-        ("输入选择", meta.get("input_selection") or "latest"), ("校园岗位", meta.get("campus")),
-        ("主列表", f"{main_g.get('shown')} / {main_g.get('total')}"), ("未匹配", meta.get("unmatched", 0)),
-        ("截断", "是" if main_g.get("truncated") else "否")))
+    charts = _summary_card(len(rows), exc_g.get("total") or 0, unk_g.get("total") or 0)
+    charts += "".join(_bar_chart(c["by"], rows) for c in spec.charts if c.get("type") == "bar")
+    meta_html = _meta_chips(meta, main_g)
     warns = "".join(f'<div class="warn">{esc_text(w)}</div>' for w in meta.get("warnings", []))
-    tab_defs = [("main", "主列表", main_g), ("excluded", "已排除", exc_g), ("unknown", "待核实", unk_g)]
-    group_tabs_html = "".join(f'<button type="button" data-tab-target="{esc_attr(k)}">{esc_text(label)}（{esc_text(g.get("shown"))}/{esc_text(g.get("total"))}）</button>'
-                         for k, label, g in tab_defs)
+    tab_defs = [("main", "主列表", main_g, "list"), ("excluded", "已排除", exc_g, "minus"), ("unknown", "待核实", unk_g, "alert")]
+    group_tabs_html = "".join(f'<button type="button" data-tab-target="{esc_attr(k)}">{icon(ic)}'
+                              f'<span>{esc_text(label)}（{esc_text(g.get("shown"))}/{esc_text(g.get("total"))}）</span></button>'
+                              for k, label, g, ic in tab_defs)
     if timeline_rows is not None:
         group_tabs_html = group_tabs_html + TIMELINE_TAB_BUTTON
         timeline_html = render_section(timeline_rows, timeline_meta or [])
     else:
         timeline_html = ""
     values = {"TITLE": esc_text(spec.title), "META": meta_html, "WARNINGS": warns,
+              "LOGO": icon("bars"), "SUBTITLE": _subtitle(meta.get("as_of")),
+              "COLSPAN": str(max(1, len(cols))), "TOTAL_ROWS": esc_text(len(rows)),
               "CHARTS": charts, "FILTERS": "".join(filters), "THEAD": thead,
               "TBODY": "".join(body), "FILTER_JS": js,
               "TIMELINE": timeline_html, "GROUP_TABS": group_tabs_html,

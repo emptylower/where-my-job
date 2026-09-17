@@ -7,25 +7,32 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
 <title>{{TITLE}}</title>
 <style>
-/* 设计令牌：浅色为默认，深色在 media query 里整套重定义 */
+/* 设计令牌：浅色为默认，深色在 media query 里整套重定义。
+   安全用例禁止外部资源：样式里既不能导入外部表、也不能引用任何外部地址，图标一律内联 svg，字体只用系统栈。 */
 :root{
-  --bg:#F4F5F7; --card:#FFFFFF; --fg:#1F2430; --muted:#5B6472;
-  --line:#E2E5EA; --line-strong:#C6CDD6;
-  --acc:#2F6FED; --acc-soft:rgba(47,111,237,.10); --on-acc:#FFFFFF;
-  --hover:#F0F4FB; --chip:rgba(27,39,64,.06);
-  --warn-bg:#FFF8E6; --warn-line:#F0DFAF; --warn-fg:#7A5A00; --warn-acc:#E0A82E;
-  --tier-s-fg:#8A5A00; --tier-s-bg:#FBEFD2;
-  --tier-a-fg:#1D5FD6; --tier-a-bg:#E5EEFD;
-  --tier-b-fg:#0E7264; --tier-b-bg:#E1F3EE;
-  --tier-c-fg:#5B6472; --tier-c-bg:#EDEFF3;
-  --pagehead-h:55px;
+  --bg:#EEF2F9; --card:#FFFFFF; --fg:#1B2333; --muted:#6B7688; --faint:#98A4B6;
+  --line:#E9EDF4; --line-2:#D8DFEA; --field:#F6F8FC;
+  --acc:#2F6FED; --acc-soft:#E9F0FE; --acc-line:#C2D6FA; --on-acc:#FFFFFF;
+  --hover:#F4F8FE; --track:#EDF1F8; --chip:#F2F5FA;
+  --shadow:0 1px 2px rgba(18,32,60,.05),0 8px 20px rgba(18,32,60,.05);
+  --shadow-sm:0 1px 2px rgba(18,32,60,.05);
+  --shadow-acc:0 4px 12px rgba(47,111,237,.26);
+  --r:14px; --r-sm:10px;
+  --warn-bg:#FFF8E6; --warn-line:#F2E0AE; --warn-fg:#7A5A00; --warn-acc:#E0A82E;
+  --tier-s-fg:#A87107; --tier-s-bg:#FBF0D7;
+  --tier-a-fg:#1D5FD6; --tier-a-bg:#E4EDFD;
+  --tier-b-fg:#12805F; --tier-b-bg:#DEF3EB;
+  --tier-c-fg:#5B6472; --tier-c-bg:#EBEFF5;
 }
 @media (prefers-color-scheme: dark){
   :root{
-    --bg:#12151A; --card:#1A1E25; --fg:#E2E6EC; --muted:#98A1AD;
-    --line:#2B313B; --line-strong:#3A424E;
-    --acc:#6EA8FE; --acc-soft:rgba(110,168,254,.15); --on-acc:#0E1420;
-    --hover:rgba(255,255,255,.05); --chip:rgba(255,255,255,.07);
+    --bg:#0F1319; --card:#171C24; --fg:#E3E8EF; --muted:#98A3B4; --faint:#6E7A8C;
+    --line:#242B36; --line-2:#333C4A; --field:#1E242E;
+    --acc:#6EA8FE; --acc-soft:rgba(110,168,254,.14); --acc-line:rgba(110,168,254,.45); --on-acc:#0D1420;
+    --hover:rgba(255,255,255,.045); --track:#252C38; --chip:#1E242E;
+    --shadow:0 1px 2px rgba(0,0,0,.42),0 8px 20px rgba(0,0,0,.26);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.38);
+    --shadow-acc:0 4px 12px rgba(110,168,254,.18);
     --warn-bg:rgba(224,168,46,.10); --warn-line:rgba(224,168,46,.32); --warn-fg:#EEC26A; --warn-acc:#D9A431;
     --tier-s-fg:#F2C14E; --tier-s-bg:rgba(242,193,78,.13);
     --tier-a-fg:#8FB3FF; --tier-a-bg:rgba(110,168,254,.15);
@@ -34,100 +41,174 @@
   }
 }
 *{box-sizing:border-box}
-body{margin:0;font:14px/1.55 -apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;color:var(--fg);background:var(--bg)}
-.wrap{max-width:1280px;margin:0 auto;padding:0 24px 40px}
-/* 吸顶页头：高度固定（标题与 meta 均单行），表头按其高度偏移 */
-.pagehead{position:sticky;top:0;z-index:40;display:flex;align-items:baseline;gap:16px;padding:16px 0 10px;background:var(--bg);border-bottom:1px solid var(--line)}
-h1{margin:0;font-size:20px;font-weight:650;line-height:1.4;white-space:nowrap}
-.meta{flex:1;min-width:0;overflow-x:auto;white-space:nowrap;scrollbar-width:none;color:var(--muted);font-size:12px}
-.meta span{margin-right:16px}
-h2{margin:16px 0 8px;font-size:15px;font-weight:600}
+body{margin:0;font:14px/1.55 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;color:var(--fg);background:var(--bg);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1360px;margin:0 auto;padding:22px 24px 40px}
 a{color:var(--acc);text-decoration:none}
 a:hover{text-decoration:underline}
-:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
-.warn{margin:14px 0 0;padding:9px 12px;border:1px solid var(--warn-line);border-left:3px solid var(--warn-acc);border-radius:8px;background:var(--warn-bg);color:var(--warn-fg);font-size:13px}
-.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
-.tabs button{appearance:none;font:inherit;font-size:13px;line-height:1.45;padding:5px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--fg);cursor:pointer}
-.tabs button:hover{border-color:var(--acc);color:var(--acc)}
-.tabs button[aria-selected="true"]{background:var(--acc);border-color:var(--acc);color:var(--on-acc);font-weight:600}
-section[hidden],tr[hidden]{display:none}
-.charts{display:flex;flex-wrap:wrap;gap:14px;margin:0 0 14px}
-.chart{min-width:250px;max-width:100%;padding:12px 16px;border:1px solid var(--line);border-radius:10px;background:var(--card)}
-.chart h2{margin:0 0 10px;font-size:13px;font-weight:600;color:var(--fg)}
-.bar{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:12px}
-.bar>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--fg)}
-.bar i{display:block;height:8px;min-width:2px;border-radius:999px;background:var(--acc);opacity:.85}
-.bar>span:last-child{color:var(--muted);font-variant-numeric:tabular-nums}
-.filters{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:0 0 12px}
-.filters label{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
-.filters select,.filters input{font:inherit;font-size:13px;line-height:1.4;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
-.filters select:hover,.filters input:hover{border-color:var(--line-strong)}
-.filters b{color:var(--fg);font-variant-numeric:tabular-nums}
-.note{margin:10px 0;color:var(--muted);font-size:12px}
-/* 主表卡片：桌面端不加 overflow，保住表头相对视口的 sticky；圆角由表头/末行单元格配合 */
-.table-wrap{border:1px solid var(--line);border-radius:10px;background:var(--card)}
-table{width:100%;border-collapse:separate;border-spacing:0;background:var(--card)}
-th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:13px}
-th{position:sticky;top:var(--pagehead-h);z-index:10;background:var(--card);color:var(--muted);font-size:12px;font-weight:600;white-space:nowrap}
-thead th:first-child{border-top-left-radius:10px}
-thead th:last-child{border-top-right-radius:10px}
-tbody tr:last-child td{border-bottom:0}
-tbody tr:last-child td:first-child{border-bottom-left-radius:10px}
-tbody tr:last-child td:last-child{border-bottom-right-radius:10px}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+/* 页头卡片：装饰性弧线被卡片裁掉，内容层 z-index 1 压在上面 */
+.pagehead{position:relative;overflow:hidden;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 24px;padding:18px 22px;border-radius:var(--r);background:var(--card);box-shadow:var(--shadow)}
+.deco{position:absolute;top:-24px;right:-30px;width:400px;height:170px;color:var(--acc);pointer-events:none}
+.brand{position:relative;z-index:1;display:flex;align-items:center;gap:14px;min-width:0}
+.logo{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;flex:none;border-radius:12px;background:var(--acc-soft);color:var(--acc)}
+.logo svg{width:22px;height:22px}
+h1{margin:0;font-size:21px;font-weight:700;line-height:1.34}
+.sub{display:inline-flex;align-items:center;gap:6px;margin:3px 0 0;color:var(--muted);font-size:12.5px}
+.sub svg{width:14px;height:14px;color:var(--faint);flex:none}
+.sub b{color:var(--fg);font-weight:600}
+.meta{position:relative;z-index:1;display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px;color:var(--muted);font-size:12.5px}
+.meta .m{display:inline-flex;align-items:center;gap:6px;min-width:0;max-width:280px;white-space:nowrap}
+.meta .m svg{width:14px;height:14px;color:var(--faint);flex:none}
+.meta .m b{color:var(--fg);font-weight:600;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.meta .m.hot svg,.meta .m.hot b{color:var(--warn-acc)}
+.warn{margin:14px 0 0;padding:10px 14px;border:1px solid var(--warn-line);border-left:3px solid var(--warn-acc);border-radius:var(--r-sm);background:var(--warn-bg);color:var(--warn-fg);font-size:13px}
+/* 页签 */
+.tabs{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 16px}
+.tabs button{display:inline-flex;align-items:center;gap:7px;appearance:none;font:inherit;font-size:13.5px;line-height:1;padding:10px 18px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);cursor:pointer;box-shadow:var(--shadow-sm)}
+.tabs button svg{width:15px;height:15px;flex:none}
+.tabs button:hover{color:var(--acc);border-color:var(--acc-line)}
+.tabs button[aria-selected="true"]{background:var(--acc);border-color:var(--acc);color:var(--on-acc);font-weight:600;box-shadow:var(--shadow-acc)}
+section[hidden],tr[hidden],tbody[hidden],button[hidden]{display:none}
+section[data-tab]{padding-bottom:4px}
+/* 概览卡片行：总数 + 各维度分布 */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(272px,1fr));gap:16px;margin:0 0 16px}
+.cards:empty{display:none}
+.card{display:flex;gap:14px;padding:18px 20px;border-radius:var(--r);background:var(--card);box-shadow:var(--shadow)}
+.cardicon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;flex:none;border-radius:11px;background:var(--acc-soft);color:var(--acc)}
+.cardicon svg{width:19px;height:19px}
+.cardbody{flex:1;min-width:0}
+.card h2{margin:0 0 9px;font-size:13.5px;font-weight:600;color:var(--fg)}
+.statnum{margin-top:2px;font-size:34px;font-weight:700;line-height:1.15;font-variant-numeric:tabular-nums}
+.statsub{margin:5px 0 0;color:var(--muted);font-size:12.5px}
+.bar{display:grid;grid-template-columns:minmax(48px,84px) 1fr 32px;align-items:center;gap:10px;margin:7px 0;font-size:12.5px}
+.barlabel{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
+.track{display:block;height:8px;border-radius:999px;background:var(--track)}
+.track i{display:block;height:100%;min-width:3px;border-radius:999px;background:var(--acc)}
+.barnum{text-align:right;color:var(--fg);font-weight:600;font-variant-numeric:tabular-nums}
+/* 筛选条 */
+.filters{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;padding:12px 16px;margin:0 0 16px;border-radius:var(--r-sm);background:var(--card);box-shadow:var(--shadow-sm)}
+.filters label{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted)}
+select,input{font:inherit;font-size:13px;line-height:1.4;color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:8px;padding:7px 10px}
+select:hover,input:hover{border-color:var(--line-2)}
+select:focus-visible,input:focus-visible{border-color:var(--acc);outline:none;box-shadow:0 0 0 3px var(--acc-soft)}
+/* 下拉箭头用 CSS 折角画，避免任何外部资源 */
+.sel{position:relative;display:inline-flex}
+.sel select{appearance:none;-webkit-appearance:none;padding-right:26px;min-width:76px;cursor:pointer}
+.sel::after{content:"";position:absolute;right:11px;top:50%;width:5.5px;height:5.5px;margin-top:-4.5px;border-right:1.6px solid var(--faint);border-bottom:1.6px solid var(--faint);transform:rotate(45deg);pointer-events:none}
+/* 搜索框与可见计数绑成一组靠右，行放不下时整组换行仍在右侧 */
+.fright{display:inline-flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-left:auto}
+.searchbox{position:relative;display:inline-flex;align-items:center}
+.searchbox svg{position:absolute;left:11px;width:15px;height:15px;color:var(--faint);pointer-events:none}
+.searchbox input{padding-left:33px;min-width:200px}
+.vis{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)}
+.vis b{color:var(--fg);font-weight:600;font-variant-numeric:tabular-nums}
+.note{margin:0 0 12px;color:var(--muted);font-size:12.5px}
+/* 表格卡片：桌面端不给容器加 overflow，保住表头相对视口的 sticky */
+.table-wrap{border-radius:var(--r);background:var(--card);box-shadow:var(--shadow)}
+table{width:100%;border-collapse:separate;border-spacing:0;background:transparent}
+th,td{padding:11px 14px;text-align:left;vertical-align:middle;font-size:13px;border-bottom:1px solid var(--line)}
+thead th{position:sticky;top:0;z-index:10;background:var(--card);color:var(--muted);font-size:12.5px;font-weight:600;white-space:nowrap;border-bottom:1px solid var(--line-2)}
+thead th:first-child{border-top-left-radius:var(--r)}
+thead th:last-child{border-top-right-radius:var(--r)}
 tbody tr:hover td{background:var(--hover)}
-section[data-tab=excluded] table,section[data-tab=unknown] table,section[data-tab=timeline] table{border:1px solid var(--line);border-radius:10px}
-/* 数值列：右对齐 + 等宽数字 */
+tbody tr:last-child td{border-bottom:0}
+.emptyrow td{padding:36px 16px;text-align:center;color:var(--muted);border-bottom:0}
 td.num{text-align:right;font-variant-numeric:tabular-nums}
 th[data-numeric="1"]{text-align:right}
-/* 长文本列：单行截断，全文在 title；多行理由列限三行 */
+/* 长文本列：单行截断，全文进 title；多行理由列限三行 */
 td.clamp{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 td.nowrap{white-space:nowrap}
-td.clamp-multi{max-width:280px}
+td.clamp-multi{max-width:300px;vertical-align:top}
 td.clamp-multi .reasons{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
-/* 可排序表头：指针之外的提示（悬停底色 + 排序方向符号） */
+/* 可排序表头：悬停底色 + 排序方向符号 */
 #jobs th{cursor:pointer;user-select:none}
-#jobs th:hover{background:var(--hover)}
-#jobs th::after{content:"↕";margin-left:4px;font-size:10px;opacity:.25}
+#jobs th:hover{background:var(--hover);color:var(--fg)}
+#jobs th::after{content:"↕";margin-left:5px;font-size:10px;opacity:.3}
 #jobs th[aria-sort="ascending"]::after{content:"▲";opacity:1;color:var(--acc)}
 #jobs th[aria-sort="descending"]::after{content:"▼";opacity:1;color:var(--acc)}
-.tier-S,.tier-A,.tier-B,.tier-C{display:inline-block;min-width:1.3em;padding:0 7px;border-radius:999px;font-size:12px;font-weight:650;line-height:1.6;text-align:center}
+.tier-S,.tier-A,.tier-B,.tier-C{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:8px;font-size:12px;font-weight:700}
 .tier-S{color:var(--tier-s-fg);background:var(--tier-s-bg)}
 .tier-A{color:var(--tier-a-fg);background:var(--tier-a-bg)}
 .tier-B{color:var(--tier-b-fg);background:var(--tier-b-bg)}
 .tier-C{color:var(--tier-c-fg);background:var(--tier-c-bg)}
-.reasons{color:var(--muted);font-size:12px;line-height:1.45}
+.reasons{color:var(--muted);font-size:12px;line-height:1.5}
 code{padding:1px 5px;border-radius:4px;background:var(--chip);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
-.timeline-meta{margin:0 0 10px;padding:0;list-style:none;color:var(--muted);font-size:12px}
-section[data-tab]{padding-bottom:8px}
-.foot{margin-top:20px;padding-top:12px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
-/* 窄屏：页头取消吸顶，表格在容器内横向滚动，页面自身不横滚 */
+/* 表尾：总数 + 分页。页码按钮由固定脚本改写 textContent/hidden，不新建元素 */
+.tfoot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 14px;padding:12px 16px;border-top:1px solid var(--line);border-radius:0 0 var(--r) var(--r);color:var(--muted);font-size:12.5px}
+.tfoot b{color:var(--fg);font-weight:600;font-variant-numeric:tabular-nums}
+.pager{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px}
+.pager button{min-width:30px;height:30px;padding:0 9px;font:inherit;font-size:12.5px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--muted);cursor:pointer;font-variant-numeric:tabular-nums}
+.pager button:hover:not([disabled]){border-color:var(--acc-line);color:var(--acc)}
+.pager button[disabled]{opacity:.4;cursor:default}
+.pager button[aria-current="page"]{background:var(--acc);border-color:var(--acc);color:var(--on-acc);font-weight:600}
+.pager .sel{margin-left:6px}
+.pager .sel select{padding:6px 28px 6px 10px;font-size:12.5px;min-width:96px}
+.timeline-meta{margin:0 0 12px;padding:0;list-style:none;color:var(--muted);font-size:12.5px}
+section[data-tab] > h2{margin:0 0 12px;font-size:15px;font-weight:600}
+section[data-tab] > p{margin:12px 0 0;color:var(--muted);font-size:12.5px}
+.foot{margin-top:22px;padding-top:14px;border-top:1px solid var(--line);color:var(--faint);font-size:12px;line-height:1.7}
+/* 窄屏：表格在容器内横向滚动，表头不再吸顶，页面自身不横滚 */
 @media (max-width:899px){
-  .wrap{padding:0 14px 28px}
-  .pagehead{position:static;flex-wrap:wrap;gap:4px 12px}
-  h1{white-space:normal}
-  .meta{white-space:normal;overflow:visible}
-  th{top:0}
+  .wrap{padding:14px 14px 28px}
+  .pagehead{padding:16px}
+  .deco{display:none}
+  h1{font-size:19px}
+  .cards{grid-template-columns:1fr}
+  .fright{margin-left:0;width:100%}
+  .searchbox{flex:1}
+  .searchbox input{min-width:0;width:100%}
   .table-wrap{overflow-x:auto}
-  section[data-tab=excluded],section[data-tab=unknown],section[data-tab=timeline]{overflow-x:auto}
+  thead th{position:static}
 }
 </style>
 </head>
 <body>
 <div class="wrap">
 <header class="pagehead">
+<svg class="deco" viewBox="0 0 400 170" fill="none" aria-hidden="true" preserveAspectRatio="xMaxYMin slice">
+<path d="M-30 142C50 142 78 26 176 26S316 114 424 64" stroke="currentColor" stroke-width="26" stroke-linecap="round" opacity=".055"/>
+<path d="M-30 178C50 178 78 62 176 62S316 150 424 100" stroke="currentColor" stroke-width="18" stroke-linecap="round" opacity=".04"/>
+</svg>
+<div class="brand">
+<span class="logo">{{LOGO}}</span>
+<div>
 <h1>{{TITLE}}</h1>
+<p class="sub">{{SUBTITLE}}</p>
+</div>
+</div>
 <div class="meta">{{META}}</div>
 </header>
 {{WARNINGS}}
 <nav class="tabs" role="tablist">{{GROUP_TABS}}</nav>
 <section data-tab="main">
-<div class="charts">{{CHARTS}}</div>
+<div class="cards">{{CHARTS}}</div>
 <div class="filters">{{FILTERS}}</div>
 <div class="table-wrap">
 <table id="jobs">
 <thead><tr>{{THEAD}}</tr></thead>
 <tbody>{{TBODY}}</tbody>
+<tbody data-empty hidden><tr class="emptyrow"><td colspan="{{COLSPAN}}">没有符合当前筛选条件的岗位</td></tr></tbody>
 </table>
+<div class="tfoot">
+<span>共 <b>{{TOTAL_ROWS}}</b> 条记录</span>
+<div class="pager">
+<button type="button" data-page-step="-1" aria-label="上一页">&#8249;</button>
+<button type="button" data-page-btn hidden></button>
+<button type="button" data-page-btn hidden></button>
+<button type="button" data-page-btn hidden></button>
+<button type="button" data-page-btn hidden></button>
+<button type="button" data-page-btn hidden></button>
+<button type="button" data-page-btn hidden></button>
+<button type="button" data-page-btn hidden></button>
+<button type="button" data-page-step="1" aria-label="下一页">&#8250;</button>
+<span class="sel"><select data-page-size aria-label="每页条数">
+<option value="20">20 条/页</option>
+<option value="50" selected>50 条/页</option>
+<option value="100">100 条/页</option>
+<option value="0">全部</option>
+</select></span>
+</div>
+</div>
 </div>
 </section>
 <section data-tab="excluded" hidden>{{EXCLUDED}}</section>
